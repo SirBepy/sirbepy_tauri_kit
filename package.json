@@ -1,0 +1,20 @@
+{
+  "name": "sirbepy-tauri-kit",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.39",
+    "jsdom": "^25.0.0",
+    "typescript": "5.9.3",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "lit-html": "3.3.2",
+    "@tauri-apps/api": "^2.0.0"
+  }
+}

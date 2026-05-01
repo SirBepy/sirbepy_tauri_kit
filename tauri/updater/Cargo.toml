@@ -1,0 +1,9 @@
+[package]
+name = "tauri_kit_updater"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tauri = { version = "2.0" }
+tauri-plugin-updater = "2.0"
