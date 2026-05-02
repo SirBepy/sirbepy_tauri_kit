@@ -1,8 +1,14 @@
 import type { TemplateResult } from "lit-html";
 
+export type SettingsValue = Record<string, unknown>;
+
 export interface BaseField {
   key: string;
   label: string;
+  /** Optional info-icon tooltip shown next to the label. Plain text. */
+  tooltip?: string;
+  /** When provided, field renders only if the predicate returns true given current settings. */
+  visibleWhen?: (current: SettingsValue) => boolean;
 }
 
 export interface NumberField extends BaseField {

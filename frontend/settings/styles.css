@@ -3,6 +3,17 @@
  * Theme via [data-theme="..."] attribute on <html>.
  */
 
+/* ==== RESET ==== */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--kit-bg);
+}
+body {
+  color: var(--kit-text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 /* ==== THEME VARS ==== */
 :root, [data-theme="light"] {
   --kit-bg: #ffffff;
@@ -128,6 +139,43 @@
 }
 .kit-section-title.kit-section-danger {
   color: var(--kit-danger);
+}
+
+/* ==== TOOLTIP ==== */
+.kit-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  cursor: help;
+  color: var(--kit-text-dim);
+  font-size: 14px;
+}
+.kit-tooltip-wrap:hover .kit-tooltip-bubble,
+.kit-tooltip-wrap:focus .kit-tooltip-bubble {
+  opacity: 1;
+  pointer-events: auto;
+}
+.kit-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--kit-bg-alt);
+  border: 1px solid var(--kit-border);
+  color: var(--kit-text);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  width: 220px;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* ==== ROWS ==== */

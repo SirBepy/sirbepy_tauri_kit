@@ -54,9 +54,11 @@ export function rootPage(deps: RootDeps): PageDef {
       <div class="kit-section">
         <div class="kit-section-title">System</div>
         ${navRow("Theme", "theme", deps.onNavTheme)}
-        ${deps.systemInline.map((f) =>
-          fieldRow(f, deps.current[f.key], (v) => deps.onChange(f.key, v)),
-        )}
+        ${deps.systemInline
+          .filter((f) => !f.visibleWhen || f.visibleWhen(deps.current))
+          .map((f) =>
+            fieldRow(f, deps.current[f.key], (v) => deps.onChange(f.key, v)),
+          )}
         ${navRow("About", "about", deps.onNavAbout)}
       </div>
 

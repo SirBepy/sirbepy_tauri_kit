@@ -22,9 +22,11 @@ export function sectionPage(
         <span class="kit-header-spacer"></span>
       </header>
       <div class="kit-section">
-        ${section.fields.map((f) =>
-          fieldRow(f, current[f.key], (v) => onChange(f.key, v)),
-        )}
+        ${section.fields
+          .filter((f) => !f.visibleWhen || f.visibleWhen(current))
+          .map((f) =>
+            fieldRow(f, current[f.key], (v) => onChange(f.key, v)),
+          )}
       </div>
     `,
   };

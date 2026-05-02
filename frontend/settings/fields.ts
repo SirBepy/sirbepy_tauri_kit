@@ -2,6 +2,22 @@ import { html, type TemplateResult } from "lit-html";
 import { invoke } from "@tauri-apps/api/core";
 import type { Field } from "./schema";
 
+/** Renders the label cell with an optional tooltip info-icon. */
+function labelCell(field: Field): TemplateResult {
+  if (!field.tooltip) {
+    return html`<span class="kit-row-label">${field.label}</span>`;
+  }
+  return html`
+    <span class="kit-row-label">
+      ${field.label}
+      <span class="kit-tooltip-wrap" tabindex="0" role="img" aria-label="info">
+        <i class="ph ph-info"></i>
+        <span class="kit-tooltip-bubble">${field.tooltip}</span>
+      </span>
+    </span>
+  `;
+}
+
 /** Renders one field as a labeled row. Used by section pages and inline rows. */
 export function fieldRow(
   field: Field,
@@ -14,7 +30,7 @@ export function fieldRow(
       const step = field.kind === "integer" ? 1 : "step" in field ? field.step : undefined;
       return html`
         <label class="kit-row">
-          <span class="kit-row-label">${field.label}</span>
+          ${labelCell(field)}
           <input
             type="number"
             data-key=${field.key}
@@ -34,7 +50,7 @@ export function fieldRow(
     case "range":
       return html`
         <label class="kit-row">
-          <span class="kit-row-label">${field.label}</span>
+          ${labelCell(field)}
           <input
             type="range"
             data-key=${field.key}
@@ -51,7 +67,7 @@ export function fieldRow(
     case "select":
       return html`
         <label class="kit-row">
-          <span class="kit-row-label">${field.label}</span>
+          ${labelCell(field)}
           <select
             data-key=${field.key}
             class="kit-select"
@@ -67,7 +83,7 @@ export function fieldRow(
     case "toggle":
       return html`
         <label class="kit-row">
-          <span class="kit-row-label">${field.label}</span>
+          ${labelCell(field)}
           <span class="kit-toggle">
             <input
               type="checkbox"
@@ -82,7 +98,7 @@ export function fieldRow(
     case "text":
       return html`
         <label class="kit-row">
-          <span class="kit-row-label">${field.label}</span>
+          ${labelCell(field)}
           <input
             type="text"
             data-key=${field.key}
@@ -96,7 +112,7 @@ export function fieldRow(
       const display = value ? String(value) : field.defaultLabel ?? "(none)";
       return html`
         <label class="kit-row">
-          <span class="kit-row-label">${field.label}</span>
+          ${labelCell(field)}
           <span class="kit-file-row">
             <span class="kit-file-display">${display}</span>
             <button
