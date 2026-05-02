@@ -2,13 +2,7 @@ import { html } from "lit-html";
 import type { Section, SettingsSchema, Field } from "../schema";
 import type { PageDef } from "../stack";
 import { fieldRow } from "../fields";
-
-// Temporary inline definition; Task 11 moves this to renderer.ts.
-export interface DangerAction {
-  label: string;
-  command: string;
-  confirmBody?: string;
-}
+import type { DangerAction } from "../renderer";
 
 export interface RootDeps {
   schema: SettingsSchema;

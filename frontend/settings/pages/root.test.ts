@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render } from "lit-html";
-import { rootPage, type DangerAction } from "./root";
+import { rootPage } from "./root";
+import type { DangerAction } from "../renderer";
 import type { SettingsSchema } from "../schema";
 import type { Field } from "../schema";
 

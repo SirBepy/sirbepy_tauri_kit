@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { defineSchema } from "./schema";
 
 const invoke = vi.fn();
 
@@ -13,110 +12,65 @@ vi.mock("@tauri-apps/api/window", () => ({
 
 vi.mock("@tauri-apps/api/event", () => ({
   emit: vi.fn(),
+  listen: vi.fn().mockResolvedValue(() => {}),
 }));
 
-describe("renderSettingsPage", () => {
+vi.mock("@tauri-apps/api/app", () => ({
+  getName: () => Promise.resolve("Mocked App"),
+  getVersion: () => Promise.resolve("0.0.1-mock"),
+}));
+
+describe("renderSettingsPage v2", () => {
+  let root: HTMLElement;
+
   beforeEach(() => {
     invoke.mockReset();
     document.body.innerHTML = "";
+    document.documentElement.removeAttribute("data-theme");
+    root = document.createElement("div");
+    document.body.appendChild(root);
   });
 
-  it("loads settings on mount and populates fields", async () => {
+  it("loads settings and applies theme on mount", async () => {
     invoke.mockImplementation(async (cmd: string) => {
-      if (cmd === "get_settings") return { work_minutes: 25, sound_enabled: true };
+      if (cmd === "get_settings") return { __kit_theme: "dark", work_minutes: 25 };
       return undefined;
     });
 
     const { renderSettingsPage } = await import("./renderer");
-    await renderSettingsPage(document.body, {
-      schema: defineSchema({
-        sections: [
-          {
-            title: "Times",
-            fields: [
-              { key: "work_minutes", kind: "number", label: "Work" },
-              { key: "sound_enabled", kind: "toggle", label: "Sound" },
-            ],
-          },
-        ],
-      }),
+    await renderSettingsPage(root, {
+      schema: { sections: [{ title: "Times", fields: [] }] },
     });
 
-    const numberInput = document.querySelector<HTMLInputElement>(
-      'input[data-key="work_minutes"]',
-    );
-    const toggleInput = document.querySelector<HTMLInputElement>(
-      'input[data-key="sound_enabled"]',
-    );
-    expect(numberInput?.value).toBe("25");
-    expect(toggleInput?.checked).toBe(true);
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
   });
 
-  it("calls save_settings on save click with current form values", async () => {
-    invoke.mockImplementation(async (cmd: string) => {
-      if (cmd === "get_settings") return { work_minutes: 25 };
-      if (cmd === "save_settings") return undefined;
-      return undefined;
-    });
-
+  it("renders root page with sections + System + Danger zone", async () => {
+    invoke.mockImplementation(async () => ({}));
     const { renderSettingsPage } = await import("./renderer");
-    await renderSettingsPage(document.body, {
-      schema: defineSchema({
-        sections: [
-          {
-            title: "Times",
-            fields: [{ key: "work_minutes", kind: "number", label: "Work" }],
-          },
-        ],
-      }),
+    await renderSettingsPage(root, {
+      schema: { sections: [{ title: "Times", fields: [] }] },
     });
 
-    const input = document.querySelector<HTMLInputElement>(
-      'input[data-key="work_minutes"]',
-    )!;
-    input.value = "42";
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-
-    const saveBtn = document.querySelector<HTMLButtonElement>(
-      'button[data-action="save"]',
-    )!;
-    saveBtn.click();
-    await new Promise((r) => setTimeout(r, 0));
-
-    expect(invoke).toHaveBeenCalledWith("save_settings", {
-      settings: { work_minutes: 42 },
-    });
+    expect(root.querySelector('[data-nav="section-times"]')).toBeTruthy();
+    expect(root.querySelector('[data-nav="theme"]')).toBeTruthy();
+    expect(root.querySelector('[data-nav="about"]')).toBeTruthy();
+    expect(root.querySelector('[data-action="reset"]')).toBeTruthy();
   });
 
-  it("renders select options", async () => {
-    invoke.mockImplementation(async () => ({ corner: "tl" }));
-
+  it("clicking a section nav-row pushes that section page", async () => {
+    invoke.mockImplementation(async () => ({}));
     const { renderSettingsPage } = await import("./renderer");
-    await renderSettingsPage(document.body, {
-      schema: defineSchema({
-        sections: [
-          {
-            title: "Pos",
-            fields: [
-              {
-                key: "corner",
-                kind: "select",
-                label: "Corner",
-                options: [
-                  { value: "tl", label: "Top Left" },
-                  { value: "tr", label: "Top Right" },
-                ],
-              },
-            ],
-          },
-        ],
-      }),
+    await renderSettingsPage(root, {
+      schema: {
+        sections: [{ title: "Times", fields: [{ key: "work_minutes", kind: "integer", label: "Pomo" }] }],
+      },
     });
 
-    const select = document.querySelector<HTMLSelectElement>(
-      'select[data-key="corner"]',
-    )!;
-    expect(select.value).toBe("tl");
-    expect(select.options.length).toBe(2);
+    const nav = root.querySelector<HTMLElement>('[data-nav="section-times"]')!;
+    nav.click();
+    // After push, root nav-row is replaced by section page; back button visible.
+    expect(root.querySelector(".kit-header-back")).toBeTruthy();
+    expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
   });
 });
