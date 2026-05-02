@@ -145,6 +145,7 @@ export async function renderSettingsPage(
           await navigator.clipboard.writeText(logs);
         },
         onBack: () => stack.pop(),
+        onRerender: () => stack.rerender(),
       }),
     );
   };

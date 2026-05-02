@@ -16,6 +16,8 @@ export interface AboutPageDeps {
   onCheckNow: () => Promise<void>;
   onCopyLogs: () => Promise<void>;
   onBack: () => void;
+  /** Called when internal state changes (e.g. version tap counter), so host can re-render. */
+  onRerender?: () => void;
 }
 
 /** Phosphor icon class for a known link key. */
@@ -50,8 +52,9 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
       state.tapCount += 1;
     }
     state.lastTapAt = now;
-    if (state.tapCount >= TAPS_REQUIRED) {
+    if (state.tapCount >= TAPS_REQUIRED && !state.debugUnlocked) {
       state.debugUnlocked = true;
+      deps.onRerender?.();
     }
   };
 
