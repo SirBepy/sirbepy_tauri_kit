@@ -4,9 +4,11 @@ pub mod paths;
 pub mod store;
 pub mod error;
 pub mod kit_settings;
+pub mod commands;
 
 pub use error::Error;
 pub use kit_settings::KitSettings;
+pub use commands::{kit_copy_logs, kit_reset_settings, with_kit_commands};
 
 use serde::{de::DeserializeOwned, Serialize};
 use tauri::{AppHandle, Runtime};
