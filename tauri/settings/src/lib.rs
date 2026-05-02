@@ -3,8 +3,10 @@
 pub mod paths;
 pub mod store;
 pub mod error;
+pub mod kit_settings;
 
 pub use error::Error;
+pub use kit_settings::KitSettings;
 
 use serde::{de::DeserializeOwned, Serialize};
 use tauri::{AppHandle, Runtime};
