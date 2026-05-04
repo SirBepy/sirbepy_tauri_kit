@@ -1,0 +1,60 @@
+/*
+ * sirbepy_tauri_kit settings design system
+ * Theme via [data-theme="..."] attribute on <html>.
+ */
+
+/* ==== RESET ==== */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--kit-bg);
+}
+body {
+  color: var(--kit-text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* ==== THEME VARS ==== */
+:root, [data-theme="light"] {
+  --kit-bg: #ffffff;
+  --kit-bg-alt: #f5f5f5;
+  --kit-bg-hover: #ebebeb;
+  --kit-text: #1a1a1a;
+  --kit-text-dim: #666;
+  --kit-accent: #2a5fb4;
+  --kit-accent-hover: #3470c8;
+  --kit-danger: #d32f2f;
+  --kit-danger-bg: #fde9e9;
+  --kit-danger-border: #f5b5b5;
+  --kit-border: #e0e0e0;
+}
+
+[data-theme="dark"] {
+  --kit-bg: #1a1a1a;
+  --kit-bg-alt: #222;
+  --kit-bg-hover: #2a2a2a;
+  --kit-text: #eaeaea;
+  --kit-text-dim: #888;
+  --kit-accent: #4a90e2;
+  --kit-accent-hover: #5da4f0;
+  --kit-danger: #ff6666;
+  --kit-danger-bg: #3a1a1a;
+  --kit-danger-border: #6a2a2a;
+  --kit-border: #2a2a2a;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --kit-bg: #1a1a1a;
+    --kit-bg-alt: #222;
+    --kit-bg-hover: #2a2a2a;
+    --kit-text: #eaeaea;
+    --kit-text-dim: #888;
+    --kit-accent: #4a90e2;
+    --kit-accent-hover: #5da4f0;
+    --kit-danger: #ff6666;
+    --kit-danger-bg: #3a1a1a;
+    --kit-danger-border: #6a2a2a;
+    --kit-border: #2a2a2a;
+  }
+}

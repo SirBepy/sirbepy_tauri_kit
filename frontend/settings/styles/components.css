@@ -1,0 +1,144 @@
+/* ==== TOOLTIP ==== */
+.kit-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  cursor: help;
+  color: var(--kit-text-dim);
+  font-size: 14px;
+}
+.kit-tooltip-wrap:hover .kit-tooltip-bubble,
+.kit-tooltip-wrap:focus .kit-tooltip-bubble {
+  opacity: 1;
+  pointer-events: auto;
+}
+.kit-tooltip-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--kit-bg-alt);
+  border: 1px solid var(--kit-border);
+  color: var(--kit-text);
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  width: 220px;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ==== INPUTS ==== */
+.kit-input, .kit-select {
+  width: 120px;
+  padding: 4px 8px;
+  font-size: 13px;
+  background: var(--kit-bg-alt);
+  color: var(--kit-text);
+  border: 1px solid var(--kit-border);
+  border-radius: 4px;
+}
+.kit-input:focus, .kit-select:focus {
+  outline: none;
+  border-color: var(--kit-accent);
+}
+.kit-range {
+  width: 160px;
+}
+
+/* ==== TOGGLE ==== */
+.kit-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 18px;
+}
+.kit-toggle input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+.kit-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--kit-bg-alt);
+  border: 1px solid var(--kit-border);
+  border-radius: 9px;
+  transition: background 150ms;
+}
+.kit-toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 14px;
+  height: 14px;
+  background: var(--kit-text-dim);
+  border-radius: 50%;
+  transition: transform 150ms, background 150ms;
+}
+.kit-toggle input:checked ~ .kit-toggle-track {
+  background: var(--kit-accent);
+  border-color: var(--kit-accent);
+}
+.kit-toggle input:checked ~ .kit-toggle-track::after {
+  transform: translateX(18px);
+  background: white;
+}
+
+/* ==== FILE PICKER ROW ==== */
+.kit-file-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kit-file-display {
+  font-size: 11px;
+  color: var(--kit-text-dim);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==== BUTTONS ==== */
+.kit-btn-primary, .kit-btn-secondary, .kit-btn-danger {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+.kit-btn-primary {
+  background: var(--kit-accent);
+  color: white;
+}
+.kit-btn-primary:hover { background: var(--kit-accent-hover); }
+.kit-btn-primary:disabled { opacity: 0.5; cursor: default; }
+.kit-btn-secondary {
+  background: var(--kit-bg-alt);
+  color: var(--kit-text);
+  border-color: var(--kit-border);
+}
+.kit-btn-secondary:hover { background: var(--kit-bg-hover); }
+.kit-btn-danger {
+  background: var(--kit-danger-bg);
+  color: var(--kit-danger);
+  border-color: var(--kit-danger-border);
+  width: 100%;
+  text-align: center;
+}
+.kit-btn-danger:hover {
+  background: var(--kit-danger);
+  color: white;
+}

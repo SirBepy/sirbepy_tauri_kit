@@ -1,0 +1,119 @@
+/* ==== ABOUT HERO ==== */
+.kit-about-hero {
+  padding: 28px 16px;
+  text-align: center;
+  border-bottom: 1px solid var(--kit-border);
+}
+.kit-about-app-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+.kit-about-version {
+  font-size: 14px;
+  color: var(--kit-text-dim);
+  cursor: pointer;
+  user-select: none;
+}
+.kit-about-status {
+  font-size: 11px;
+  color: var(--kit-text-dim);
+  margin-top: 8px;
+}
+
+/* ==== DEVELOPER LINKS ==== */
+.kit-dev-block {
+  padding: 24px 16px;
+  text-align: center;
+  border-top: 1px solid var(--kit-border);
+  margin-top: 24px;
+}
+.kit-dev-name {
+  font-size: 11px;
+  color: var(--kit-text-dim);
+  margin-bottom: 8px;
+}
+.kit-dev-links {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.kit-dev-link {
+  color: var(--kit-text-dim);
+  font-size: 24px;
+  text-decoration: none;
+  transition: color 150ms;
+}
+.kit-dev-link:hover {
+  color: var(--kit-accent);
+}
+
+/* ==== THEME PICKER CARDS ==== */
+.kit-theme-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+.kit-theme-card {
+  border: 2px solid var(--kit-border);
+  border-radius: 8px;
+  padding: 14px;
+  cursor: pointer;
+  text-align: center;
+  background: var(--kit-bg-alt);
+  transition: border-color 150ms;
+}
+.kit-theme-card:hover {
+  border-color: var(--kit-text-dim);
+}
+.kit-theme-card.kit-theme-card-active {
+  border-color: var(--kit-accent);
+}
+.kit-theme-swatch {
+  width: 100%;
+  height: 56px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.kit-theme-swatch-light { background: linear-gradient(135deg, #fff 50%, #f5f5f5 50%); border: 1px solid #ddd; }
+.kit-theme-swatch-dark { background: linear-gradient(135deg, #1a1a1a 50%, #2a2a2a 50%); }
+.kit-theme-swatch-system { background: linear-gradient(135deg, #fff 50%, #1a1a1a 50%); }
+.kit-theme-card-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ==== MODAL ==== */
+.kit-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.kit-modal {
+  background: var(--kit-bg);
+  border: 1px solid var(--kit-border);
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 360px;
+  width: 90%;
+}
+.kit-modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.kit-modal-body {
+  font-size: 13px;
+  color: var(--kit-text-dim);
+  margin-bottom: 16px;
+}
+.kit-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

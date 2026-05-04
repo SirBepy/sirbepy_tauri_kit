@@ -1,0 +1,107 @@
+/* ==== ROOT CONTAINER ==== */
+.kit-settings {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--kit-bg);
+  color: var(--kit-text);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ==== STACK + SLIDE ==== */
+.kit-stack {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+.kit-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--kit-bg);
+  transition: transform 200ms ease-out;
+}
+.kit-page.kit-page-entering {
+  transform: translateX(100%);
+}
+.kit-page.kit-page-active {
+  transform: translateX(0);
+}
+.kit-page.kit-page-exiting {
+  transform: translateX(-30%);
+  opacity: 0.5;
+}
+
+/* ==== HEADER ==== */
+.kit-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--kit-border);
+  background: var(--kit-bg);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.kit-header-back {
+  width: 80px;
+  background: none;
+  border: none;
+  color: var(--kit-text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 0;
+}
+.kit-header-back:hover { color: var(--kit-text); }
+.kit-header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+.kit-header-spacer { width: 80px; }
+
+/* ==== SECTIONS ==== */
+.kit-section {
+  margin-top: 16px;
+}
+.kit-section-title {
+  padding: 8px 16px;
+  color: var(--kit-text-dim);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+.kit-section-title.kit-section-danger {
+  color: var(--kit-danger);
+}
+
+/* ==== ROWS ==== */
+.kit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--kit-border);
+  background: var(--kit-bg);
+}
+.kit-row-label {
+  font-size: 13px;
+  flex: 1;
+}
+.kit-nav-row {
+  cursor: pointer;
+  user-select: none;
+}
+.kit-nav-row:hover {
+  background: var(--kit-bg-hover);
+}
+.kit-nav-arrow {
+  color: var(--kit-text-dim);
+  font-size: 18px;
+  line-height: 1;
+}
