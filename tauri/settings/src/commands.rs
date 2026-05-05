@@ -12,7 +12,7 @@ use tauri::{
 pub async fn kit_copy_logs<R: Runtime>(app: AppHandle<R>) -> Result<String, String> {
     let dir = app
         .path()
-        .app_data_dir()
+        .app_log_dir()
         .map_err(|e| e.to_string())?;
     let log_path = dir.join("app.log");
     if !log_path.exists() {

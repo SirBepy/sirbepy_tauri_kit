@@ -40,9 +40,14 @@ interface AboutState {
 
 const TAP_WINDOW_MS = 3000;
 const TAPS_REQUIRED = 5;
+const DEBUG_STORAGE_KEY = "kit_debug_unlocked";
 
 export function aboutPage(deps: AboutPageDeps): PageDef {
-  const state: AboutState = { tapCount: 0, lastTapAt: 0, debugUnlocked: false };
+  const state: AboutState = {
+    tapCount: 0,
+    lastTapAt: 0,
+    debugUnlocked: localStorage.getItem(DEBUG_STORAGE_KEY) === "1",
+  };
 
   const onVersionTap = () => {
     const now = Date.now();
@@ -54,18 +59,9 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
     state.lastTapAt = now;
     if (state.tapCount >= TAPS_REQUIRED && !state.debugUnlocked) {
       state.debugUnlocked = true;
+      localStorage.setItem(DEBUG_STORAGE_KEY, "1");
       deps.onRerender?.();
     }
-  };
-
-  const formatLastChecked = (d: Date | null): string => {
-    if (!d) return "Never";
-    const diffMs = Date.now() - d.getTime();
-    const mins = Math.floor(diffMs / 60_000);
-    if (mins < 1) return "just now";
-    if (mins < 60) return `${mins} min ago`;
-    const hrs = Math.floor(mins / 60);
-    return `${hrs}h ago`;
   };
 
   return {
@@ -99,10 +95,6 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
             <option value="immediate">Immediate</option>
           </select>
         </label>
-        <div class="kit-row">
-          <span class="kit-row-label" style="color: var(--kit-text-dim)">Last checked</span>
-          <span style="color: var(--kit-text-dim); font-size: 12px">${formatLastChecked(deps.lastChecked)}</span>
-        </div>
         <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
           <button
             class="kit-btn-secondary"

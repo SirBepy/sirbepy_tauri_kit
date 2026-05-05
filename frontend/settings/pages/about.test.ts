@@ -7,6 +7,7 @@ describe("aboutPage", () => {
 
   beforeEach(() => {
     document.body.innerHTML = "";
+    localStorage.clear();
     root = document.createElement("div");
     document.body.appendChild(root);
     vi.useFakeTimers();
@@ -78,6 +79,27 @@ describe("aboutPage", () => {
     render(page.render(), root); // re-render after state change
     const btn = root.querySelector('[data-action="copy-logs"]');
     expect(btn).toBeTruthy();
+  });
+
+  it("debug unlock persists across page instances via localStorage", () => {
+    const page1 = aboutPage(defaultDeps());
+    render(page1.render(), root);
+    const ver = root.querySelector<HTMLElement>(".kit-about-version")!;
+    for (let i = 0; i < 5; i++) {
+      ver.click();
+      vi.advanceTimersByTime(100);
+    }
+    // New page instance should read localStorage
+    const page2 = aboutPage(defaultDeps());
+    render(page2.render(), root);
+    const btn = root.querySelector('[data-action="copy-logs"]');
+    expect(btn).toBeTruthy();
+  });
+
+  it("does not render Last checked row", () => {
+    const page = aboutPage(defaultDeps());
+    render(page.render(), root);
+    expect(root.textContent).not.toContain("Last checked");
   });
 
   it("taps spaced beyond 3s reset the counter", () => {

@@ -1,5 +1,5 @@
 import { check } from "@tauri-apps/plugin-updater";
-import { ask } from "@tauri-apps/plugin-dialog";
+import { ask, message } from "@tauri-apps/plugin-dialog";
 
 export interface CheckOptions {
   /** Defaults to "Update available". */
@@ -11,7 +11,10 @@ export interface CheckOptions {
 export async function checkAndPromptUpdate(opts: CheckOptions = {}): Promise<void> {
   try {
     const update = await check();
-    if (!update) return;
+    if (!update) {
+      await message("You're up to date.", { title: "No updates found", kind: "info" });
+      return;
+    }
 
     const title = opts.promptTitle ?? "Update available";
     const body = opts.promptBody
@@ -23,6 +26,6 @@ export async function checkAndPromptUpdate(opts: CheckOptions = {}): Promise<voi
 
     await update.downloadAndInstall();
   } catch (err) {
-    console.warn("[tauri_kit_updater] update check failed:", err);
+    await message(`Update check failed: ${String(err)}`, { title: "Update error", kind: "error" });
   }
 }
