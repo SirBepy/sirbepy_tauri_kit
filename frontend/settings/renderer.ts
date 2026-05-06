@@ -62,15 +62,12 @@ export async function renderSettingsPage(
   const saveCmd = opts.saveCommand ?? "save_settings";
   const savedEvent = opts.savedEvent ?? "settings-updated";
 
-  // Load settings.
-  const initial = (await invoke<SettingsValue>(loadCmd)) ?? {};
-  let current: SettingsValue = { ...initial };
+  // Apply default theme before first paint to avoid a light-flash on dark setups.
+  applyTheme(opts.theme?.default ?? "system");
 
-  // Apply theme before first paint.
-  const initialTheme = (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
-  applyTheme(initialTheme);
-
-  // Stack management.
+  // Synchronous DOM scaffold + first paint with empty values.
+  // Settings hydrate asynchronously below; sections list is schema-driven and renders immediately.
+  let current: SettingsValue = {};
   const stackRoot = document.createElement("div");
   stackRoot.className = "kit-settings";
   root.replaceChildren(stackRoot);
@@ -80,7 +77,18 @@ export async function renderSettingsPage(
   const modalRoot = document.createElement("div");
   root.appendChild(modalRoot);
 
+  // Hydration gate: setField waits for initial load so user clicks during hydration
+  // don't race-overwrite saved settings with the empty placeholder object.
+  const hydrated = (async () => {
+    const initial = (await invoke<SettingsValue>(loadCmd)) ?? {};
+    current = { ...initial };
+    const theme = (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
+    applyTheme(theme);
+    stack.rerender();
+  })();
+
   const setField = async (key: string, value: unknown) => {
+    await hydrated;
     current[key] = value;
     // Auto-save on every change. Per spec: settings persist immediately.
     await invoke(saveCmd, { settings: current });
@@ -176,17 +184,11 @@ export async function renderSettingsPage(
     }
   };
 
-  // Listen for settings-reset events so the settings window also re-reads if app modified state.
-  const unlisten = await listen("settings-reset", async () => {
-    const fresh = (await invoke<SettingsValue>(loadCmd)) ?? {};
-    current = { ...fresh };
-    applyTheme((current["__kit_theme"] as ThemeValue) ?? "system");
-    stack.rerender();
-  });
-
   // navAbout is async because of dynamic getName/getVersion. Wrap as fire-and-forget for the sync nav callback.
   const navAboutSync = () => { void navAbout(); };
 
+  // First paint: schema-driven shell renders immediately with empty `current`.
+  // Hydration above will rerender once settings load, swapping defaults for saved values.
   stack.push(
     rootPage({
       schema: opts.schema,
@@ -202,8 +204,21 @@ export async function renderSettingsPage(
     }),
   );
 
+  // Listen for settings-reset events so the settings window also re-reads if app modified state.
+  // Registered after first paint; fire-and-forget so listener wiring never blocks initial render.
+  let unlisten: (() => void) | null = null;
+  void listen("settings-reset", async () => {
+    const fresh = (await invoke<SettingsValue>(loadCmd)) ?? {};
+    current = { ...fresh };
+    applyTheme((current["__kit_theme"] as ThemeValue) ?? "system");
+    stack.rerender();
+  }).then((fn) => { unlisten = fn; });
+
+  // Wait for hydration before resolving so callers (and tests) observe loaded state on resolve.
+  await hydrated;
+
   return () => {
-    void unlisten();
+    if (unlisten) unlisten();
     render(html``, root);
   };
 }
