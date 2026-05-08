@@ -6,7 +6,7 @@ import type { SettingsSchema, Section, Field } from "./schema";
 import { PageStack } from "./stack";
 import { rootPage } from "./pages/root";
 import { sectionPage } from "./pages/section";
-import { themePage, applyTheme, type ThemeValue } from "./pages/theme";
+import { applyTheme, type ThemeValue } from "./pages/theme";
 import { aboutPage, type AutoUpdateMode } from "./pages/about";
 import { resetModal } from "./pages/reset-modal";
 
@@ -103,18 +103,9 @@ export async function renderSettingsPage(
     );
   };
 
-  const navTheme = () => {
-    stack.push(
-      themePage(
-        (current["__kit_theme"] as ThemeValue) ?? "system",
-        async (t) => {
-          await setField("__kit_theme", t);
-          applyTheme(t);
-          stack.rerender();
-        },
-        () => stack.pop(),
-      ),
-    );
+  const onThemeChange = async (t: ThemeValue) => {
+    applyTheme(t);
+    await setField("__kit_theme", t);
   };
 
   const navAbout = async () => {
@@ -195,9 +186,12 @@ export async function renderSettingsPage(
       systemInline: opts.systemInline ?? [],
       dangerActions: opts.dangerActions ?? [],
       current,
+      get theme() {
+        return (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
+      },
       onChange: setField,
       onNavSection: navSection,
-      onNavTheme: navTheme,
+      onThemeChange,
       onNavAbout: navAboutSync,
       onReset,
       onDanger,

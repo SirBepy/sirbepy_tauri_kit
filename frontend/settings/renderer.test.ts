@@ -53,7 +53,7 @@ describe("renderSettingsPage v2", () => {
     });
 
     expect(root.querySelector('[data-nav="section-times"]')).toBeTruthy();
-    expect(root.querySelector('[data-nav="theme"]')).toBeTruthy();
+    expect(root.querySelector('select[data-key="__kit_theme"]')).toBeTruthy();
     expect(root.querySelector('[data-nav="about"]')).toBeTruthy();
     expect(root.querySelector('[data-action="reset"]')).toBeTruthy();
   });

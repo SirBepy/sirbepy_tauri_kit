@@ -3,19 +3,27 @@ import type { Section, SettingsSchema, Field } from "../schema";
 import type { PageDef } from "../stack";
 import { fieldRow } from "../fields";
 import type { DangerAction } from "../renderer";
+import type { ThemeValue } from "./theme";
 
 export interface RootDeps {
   schema: SettingsSchema;
   systemInline: Field[];
   dangerActions: DangerAction[];
   current: Record<string, unknown>;
+  theme: ThemeValue;
   onChange: (key: string, value: unknown) => void;
   onNavSection: (section: Section) => void;
-  onNavTheme: () => void;
+  onThemeChange: (theme: ThemeValue) => void;
   onNavAbout: () => void;
   onReset: () => void;
   onDanger: (action: DangerAction) => void;
 }
+
+const THEME_OPTIONS: { value: ThemeValue; label: string }[] = [
+  { value: "system", label: "System" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
 
 function navRow(label: string, dataNav: string, onClick: () => void) {
   return html`
@@ -53,7 +61,19 @@ export function rootPage(deps: RootDeps): PageDef {
 
       <div class="kit-section">
         <div class="kit-section-title">System</div>
-        ${navRow("Theme", "theme", deps.onNavTheme)}
+        <label class="kit-row" data-row="theme">
+          <span class="kit-row-label">Theme</span>
+          <select
+            data-key="__kit_theme"
+            class="kit-select"
+            @change=${(e: Event) =>
+              deps.onThemeChange((e.target as HTMLSelectElement).value as ThemeValue)}
+          >
+            ${THEME_OPTIONS.map(
+              (opt) => html`<option value=${opt.value} ?selected=${opt.value === deps.theme}>${opt.label}</option>`,
+            )}
+          </select>
+        </label>
         ${deps.systemInline
           .filter((f) => !f.visibleWhen || f.visibleWhen(deps.current))
           .map((f) =>

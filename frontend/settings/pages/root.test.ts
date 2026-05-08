@@ -26,9 +26,10 @@ describe("rootPage", () => {
       systemInline: [] as Field[],
       dangerActions: [] as DangerAction[],
       current: {} as Record<string, unknown>,
+      theme: "system" as const,
       onChange: () => {},
       onNavSection: () => {},
-      onNavTheme: () => {},
+      onThemeChange: () => {},
       onNavAbout: () => {},
       onReset: () => {},
       onDanger: () => {},
@@ -40,8 +41,8 @@ describe("rootPage", () => {
     const page = rootPage(defaultDeps());
     render(page.render(), root);
     const navRows = root.querySelectorAll(".kit-nav-row");
-    // schema sections (2) + Theme (1) + About (1) = 4 nav-rows
-    expect(navRows.length).toBe(4);
+    // schema sections (2) + About (1) = 3 nav-rows (Theme is now an inline select)
+    expect(navRows.length).toBe(3);
   });
 
   it("clicking schema section calls onNavSection with that section", () => {
@@ -53,13 +54,24 @@ describe("rootPage", () => {
     expect(calls).toEqual(["Times"]);
   });
 
-  it("clicking Theme calls onNavTheme", () => {
-    let called = false;
-    const page = rootPage(defaultDeps({ onNavTheme: () => { called = true; } }));
+  it("renders an inline theme select with the current value", () => {
+    const page = rootPage(defaultDeps({ theme: "dark" }));
     render(page.render(), root);
-    const row = root.querySelector<HTMLElement>('[data-nav="theme"]')!;
-    row.click();
-    expect(called).toBe(true);
+    const select = root.querySelector<HTMLSelectElement>('select[data-key="__kit_theme"]')!;
+    expect(select).toBeTruthy();
+    expect(select.value).toBe("dark");
+    const opts = Array.from(select.options).map((o) => o.value);
+    expect(opts).toEqual(["system", "light", "dark"]);
+  });
+
+  it("changing the theme select calls onThemeChange with the new value", () => {
+    const calls: string[] = [];
+    const page = rootPage(defaultDeps({ onThemeChange: (t) => calls.push(t) }));
+    render(page.render(), root);
+    const select = root.querySelector<HTMLSelectElement>('select[data-key="__kit_theme"]')!;
+    select.value = "light";
+    select.dispatchEvent(new Event("change"));
+    expect(calls).toEqual(["light"]);
   });
 
   it("clicking About calls onNavAbout", () => {
