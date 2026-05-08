@@ -73,9 +73,18 @@ export type Field =
   | FileField
   | CustomField;
 
+export interface SectionGroup {
+  /** Optional sub-header rendered above this group of fields. */
+  title?: string;
+  fields: Field[];
+}
+
 export interface Section {
   title: string;
-  fields: Field[];
+  /** Flat layout: a single list of fields under the section header. */
+  fields?: Field[];
+  /** Grouped layout: multiple sub-sections, each with an optional sub-header. */
+  groups?: SectionGroup[];
 }
 
 export interface SettingsSchema {

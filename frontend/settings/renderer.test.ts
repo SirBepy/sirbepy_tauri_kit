@@ -73,4 +73,38 @@ describe("renderSettingsPage v2", () => {
     expect(root.querySelector(".kit-header-back")).toBeTruthy();
     expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
   });
+
+  it("renders grouped section as multiple sub-sections with sub-headers", async () => {
+    invoke.mockImplementation(async () => ({}));
+    const { renderSettingsPage } = await import("./renderer");
+    await renderSettingsPage(root, {
+      schema: {
+        sections: [
+          {
+            title: "Timer",
+            groups: [
+              {
+                title: "Durations",
+                fields: [{ key: "work_minutes", kind: "integer", label: "Pomo" }],
+              },
+              {
+                title: "Behavior",
+                fields: [{ key: "auto_start_work", kind: "toggle", label: "Auto" }],
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    root.querySelector<HTMLElement>('[data-nav="section-timer"]')!.click();
+
+    const titles = Array.from(root.querySelectorAll(".kit-section-title")).map(
+      (el) => el.textContent?.trim(),
+    );
+    expect(titles).toContain("Durations");
+    expect(titles).toContain("Behavior");
+    expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
+    expect(root.querySelector('[data-key="auto_start_work"]')).toBeTruthy();
+  });
 });

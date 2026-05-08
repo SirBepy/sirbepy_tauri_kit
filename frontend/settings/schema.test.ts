@@ -15,6 +15,23 @@ describe("defineSchema", () => {
     expect(s.sections[0].fields[0].key).toBe("k");
   });
 
+  it("accepts grouped sections", () => {
+    const s = defineSchema({
+      sections: [
+        {
+          title: "T",
+          groups: [
+            { title: "G1", fields: [{ key: "a", kind: "toggle", label: "A" }] },
+            { fields: [{ key: "b", kind: "toggle", label: "B" }] },
+          ],
+        },
+      ],
+    });
+    expect(s.sections[0].groups?.length).toBe(2);
+    expect(s.sections[0].groups?.[0].title).toBe("G1");
+    expect(s.sections[0].groups?.[1].title).toBeUndefined();
+  });
+
   it("infers field kind discriminant", () => {
     const s = defineSchema({
       sections: [

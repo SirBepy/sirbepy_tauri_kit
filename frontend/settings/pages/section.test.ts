@@ -57,6 +57,46 @@ describe("sectionPage", () => {
     expect(page.id).toMatch(/^section-/);
   });
 
+  it("renders grouped sections with sub-headers", () => {
+    const section: Section = {
+      title: "Timer",
+      groups: [
+        {
+          title: "Durations",
+          fields: [{ key: "work_minutes", kind: "integer", label: "Pomo" }],
+        },
+        {
+          title: "Behavior",
+          fields: [{ key: "auto_start_work", kind: "toggle", label: "Auto" }],
+        },
+      ],
+    };
+    const page = sectionPage(section, { work_minutes: 25, auto_start_work: true }, () => {}, () => {});
+    render(page.render(), root);
+
+    const titles = Array.from(root.querySelectorAll(".kit-section-title")).map(
+      (el) => el.textContent?.trim(),
+    );
+    expect(titles).toEqual(["Durations", "Behavior"]);
+    expect(root.querySelectorAll(".kit-section").length).toBe(2);
+    expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
+    expect(root.querySelector('[data-key="auto_start_work"]')).toBeTruthy();
+  });
+
+  it("renders grouped section without title when title omitted", () => {
+    const section: Section = {
+      title: "Timer",
+      groups: [
+        { fields: [{ key: "work_minutes", kind: "integer", label: "Pomo" }] },
+      ],
+    };
+    const page = sectionPage(section, { work_minutes: 25 }, () => {}, () => {});
+    render(page.render(), root);
+
+    expect(root.querySelectorAll(".kit-section-title").length).toBe(0);
+    expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
+  });
+
   it("renders back button that calls onBack", () => {
     const section: Section = { title: "Times", fields: [] };
     let backCalled = false;
