@@ -45,7 +45,7 @@ describe("renderSettingsPage v2", () => {
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
   });
 
-  it("renders root page with sections + System + Danger zone", async () => {
+  it("renders root page with sections + System nav-row", async () => {
     invoke.mockImplementation(async () => ({}));
     const { renderSettingsPage } = await import("./renderer");
     await renderSettingsPage(root, {
@@ -53,6 +53,22 @@ describe("renderSettingsPage v2", () => {
     });
 
     expect(root.querySelector('[data-nav="section-times"]')).toBeTruthy();
+    expect(root.querySelector('[data-nav="system"]')).toBeTruthy();
+    // Theme/About/Reset live in the System subpage now, not on root.
+    expect(root.querySelector('select[data-key="__kit_theme"]')).toBeFalsy();
+    expect(root.querySelector('[data-nav="about"]')).toBeFalsy();
+    expect(root.querySelector('[data-action="reset"]')).toBeFalsy();
+  });
+
+  it("clicking System nav-row pushes the System subpage", async () => {
+    invoke.mockImplementation(async () => ({}));
+    const { renderSettingsPage } = await import("./renderer");
+    await renderSettingsPage(root, {
+      schema: { sections: [{ title: "Times", fields: [] }] },
+    });
+
+    const nav = root.querySelector<HTMLElement>('[data-nav="system"]')!;
+    nav.click();
     expect(root.querySelector('select[data-key="__kit_theme"]')).toBeTruthy();
     expect(root.querySelector('[data-nav="about"]')).toBeTruthy();
     expect(root.querySelector('[data-action="reset"]')).toBeTruthy();

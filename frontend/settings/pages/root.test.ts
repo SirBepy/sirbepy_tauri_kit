@@ -31,17 +31,18 @@ describe("rootPage", () => {
       onNavSection: () => {},
       onThemeChange: () => {},
       onNavAbout: () => {},
+      onNavSystem: () => {},
       onReset: () => {},
       onDanger: () => {},
       ...overrides,
     };
   }
 
-  it("renders one nav-row per schema section", () => {
+  it("renders one nav-row per schema section plus a System nav-row", () => {
     const page = rootPage(defaultDeps());
     render(page.render(), root);
     const navRows = root.querySelectorAll(".kit-nav-row");
-    // schema sections (2) + About (1) = 3 nav-rows (Theme is now an inline select)
+    // schema sections (2) + System (1) = 3
     expect(navRows.length).toBe(3);
   });
 
@@ -54,72 +55,19 @@ describe("rootPage", () => {
     expect(calls).toEqual(["Times"]);
   });
 
-  it("renders an inline theme select with the current value", () => {
-    const page = rootPage(defaultDeps({ theme: "dark" }));
-    render(page.render(), root);
-    const select = root.querySelector<HTMLSelectElement>('select[data-key="__kit_theme"]')!;
-    expect(select).toBeTruthy();
-    expect(select.value).toBe("dark");
-    const opts = Array.from(select.options).map((o) => o.value);
-    expect(opts).toEqual(["system", "light", "dark"]);
-  });
-
-  it("changing the theme select calls onThemeChange with the new value", () => {
-    const calls: string[] = [];
-    const page = rootPage(defaultDeps({ onThemeChange: (t) => calls.push(t) }));
-    render(page.render(), root);
-    const select = root.querySelector<HTMLSelectElement>('select[data-key="__kit_theme"]')!;
-    select.value = "light";
-    select.dispatchEvent(new Event("change"));
-    expect(calls).toEqual(["light"]);
-  });
-
-  it("clicking About calls onNavAbout", () => {
+  it("clicking System nav-row calls onNavSystem", () => {
     let called = false;
-    const page = rootPage(defaultDeps({ onNavAbout: () => { called = true; } }));
+    const page = rootPage(defaultDeps({ onNavSystem: () => { called = true; } }));
     render(page.render(), root);
-    const row = root.querySelector<HTMLElement>('[data-nav="about"]')!;
+    const row = root.querySelector<HTMLElement>('[data-nav="system"]')!;
     row.click();
     expect(called).toBe(true);
   });
 
-  it("renders systemInline fields as inline rows", () => {
-    const page = rootPage(defaultDeps({
-      systemInline: [{ key: "autostart", kind: "toggle", label: "Launch at startup" }],
-    }));
+  it("System nav-row appears even with empty schema", () => {
+    const page = rootPage(defaultDeps({ schema: { sections: [] } }));
     render(page.render(), root);
-    const toggle = root.querySelector<HTMLInputElement>('input[data-key="autostart"]');
-    expect(toggle).toBeTruthy();
-  });
-
-  it("Reset button always renders in danger zone", () => {
-    const page = rootPage(defaultDeps());
-    render(page.render(), root);
-    const reset = root.querySelector<HTMLButtonElement>('[data-action="reset"]');
-    expect(reset).toBeTruthy();
-  });
-
-  it("dangerActions render as additional danger buttons", () => {
-    const page = rootPage(defaultDeps({
-      dangerActions: [{ label: "Log out", command: "logout" }],
-    }));
-    render(page.render(), root);
-    const buttons = root.querySelectorAll(".kit-btn-danger");
-    // Reset (1) + Log out (1) = 2
-    expect(buttons.length).toBe(2);
-    expect(buttons[1].textContent).toContain("Log out");
-  });
-
-  it("clicking a dangerAction calls onDanger with that action", () => {
-    const calls: string[] = [];
-    const action: DangerAction = { label: "Log out", command: "logout" };
-    const page = rootPage(defaultDeps({
-      dangerActions: [action],
-      onDanger: (a) => calls.push(a.command),
-    }));
-    render(page.render(), root);
-    const logoutBtn = root.querySelectorAll<HTMLButtonElement>(".kit-btn-danger")[1];
-    logoutBtn.click();
-    expect(calls).toEqual(["logout"]);
+    const row = root.querySelector<HTMLElement>('[data-nav="system"]');
+    expect(row).toBeTruthy();
   });
 });

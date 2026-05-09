@@ -1,0 +1,84 @@
+import { html } from "lit-html";
+import type { Field } from "../schema";
+import type { PageDef } from "../stack";
+import { fieldRow } from "../fields";
+import type { DangerAction } from "../renderer";
+import type { ThemeValue } from "./theme";
+
+export interface SystemPageDeps {
+  systemInline: Field[];
+  dangerActions: DangerAction[];
+  current: Record<string, unknown>;
+  theme: ThemeValue;
+  onChange: (key: string, value: unknown) => void;
+  onThemeChange: (theme: ThemeValue) => void;
+  onNavAbout: () => void;
+  onReset: () => void;
+  onDanger: (action: DangerAction) => void;
+  onBack: () => void;
+}
+
+const THEME_OPTIONS: { value: ThemeValue; label: string }[] = [
+  { value: "system", label: "System" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
+export function systemPage(deps: SystemPageDeps): PageDef {
+  return {
+    id: "system",
+    title: "System",
+    render: () => html`
+      <header class="kit-header">
+        <button class="kit-header-back" @click=${deps.onBack}>‹ Settings</button>
+        <h2 class="kit-header-title">System</h2>
+        <span class="kit-header-spacer"></span>
+      </header>
+
+      <div class="kit-section">
+        <label class="kit-row" data-row="theme">
+          <span class="kit-row-label">Theme</span>
+          <select
+            data-key="__kit_theme"
+            class="kit-select"
+            @change=${(e: Event) =>
+              deps.onThemeChange((e.target as HTMLSelectElement).value as ThemeValue)}
+          >
+            ${THEME_OPTIONS.map(
+              (opt) => html`<option value=${opt.value} ?selected=${opt.value === deps.theme}>${opt.label}</option>`,
+            )}
+          </select>
+        </label>
+        ${deps.systemInline
+          .filter((f) => !f.visibleWhen || f.visibleWhen(deps.current))
+          .map((f) =>
+            fieldRow(f, deps.current[f.key], (v) => deps.onChange(f.key, v)),
+          )}
+        <div class="kit-row kit-nav-row" data-nav="about" @click=${deps.onNavAbout}>
+          <span class="kit-row-label">About</span>
+          <span class="kit-nav-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="kit-section">
+        <div class="kit-section-title kit-section-danger">Danger zone</div>
+        <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
+          <button class="kit-btn-danger" data-action="reset" @click=${deps.onReset}>
+            Reset all settings
+          </button>
+        </div>
+        ${deps.dangerActions.map(
+          (a) => html`
+            <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
+              <button
+                class="kit-btn-danger"
+                data-action=${`danger-${a.command}`}
+                @click=${() => deps.onDanger(a)}
+              >${a.label}</button>
+            </div>
+          `,
+        )}
+      </div>
+    `,
+  };
+}

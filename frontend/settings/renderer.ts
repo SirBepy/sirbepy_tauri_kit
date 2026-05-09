@@ -8,6 +8,7 @@ import { rootPage } from "./pages/root";
 import { sectionPage } from "./pages/section";
 import { applyTheme, type ThemeValue } from "./pages/theme";
 import { aboutPage, type AutoUpdateMode } from "./pages/about";
+import { systemPage } from "./pages/system";
 import { resetModal } from "./pages/reset-modal";
 
 export interface DangerAction {
@@ -178,6 +179,25 @@ export async function renderSettingsPage(
   // navAbout is async because of dynamic getName/getVersion. Wrap as fire-and-forget for the sync nav callback.
   const navAboutSync = () => { void navAbout(); };
 
+  const navSystem = () => {
+    stack.push(
+      systemPage({
+        systemInline: opts.systemInline ?? [],
+        dangerActions: opts.dangerActions ?? [],
+        current,
+        get theme() {
+          return (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
+        },
+        onChange: setField,
+        onThemeChange,
+        onNavAbout: navAboutSync,
+        onReset,
+        onDanger,
+        onBack: () => stack.pop(),
+      }),
+    );
+  };
+
   // First paint: schema-driven shell renders immediately with empty `current`.
   // Hydration above will rerender once settings load, swapping defaults for saved values.
   stack.push(
@@ -193,6 +213,7 @@ export async function renderSettingsPage(
       onNavSection: navSection,
       onThemeChange,
       onNavAbout: navAboutSync,
+      onNavSystem: navSystem,
       onReset,
       onDanger,
     }),
