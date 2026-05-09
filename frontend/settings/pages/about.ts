@@ -1,4 +1,5 @@
 import { html } from "lit-html";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import type { PageDef } from "../stack";
 
 export type AutoUpdateMode = "never" | "onStartup" | "immediate";
@@ -74,6 +75,7 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
         <span class="kit-header-spacer"></span>
       </header>
 
+      <div class="kit-about-page">
       <div class="kit-about-hero">
         <div class="kit-about-app-name">${deps.appName}</div>
         <div class="kit-about-version" @click=${onVersionTap}>v${deps.version}</div>
@@ -125,12 +127,18 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
             .filter(([, url]) => !!url)
             .map(
               ([key, url]) => html`
-                <a class="kit-dev-link" href=${url!} target="_blank" rel="noopener" title=${key}>
+                <button
+                  class="kit-dev-link"
+                  type="button"
+                  title=${key}
+                  @click=${() => void openUrl(url!)}
+                >
                   <i class=${iconClassFor(key)}></i>
-                </a>
+                </button>
               `,
             )}
         </div>
+      </div>
       </div>
     `,
   };
