@@ -131,6 +131,16 @@
   border-color: var(--kit-border);
 }
 .kit-btn-secondary:hover { background: var(--kit-bg-hover); }
+.kit-btn-secondary:disabled { opacity: 0.6; cursor: default; }
+.kit-btn-secondary:disabled:hover { background: var(--kit-bg-alt); }
+
+@keyframes kit-spin {
+  to { transform: rotate(360deg); }
+}
+.kit-spin {
+  display: inline-block;
+  animation: kit-spin 800ms linear infinite;
+}
 .kit-btn-danger {
   background: var(--kit-danger-bg);
   color: var(--kit-danger);

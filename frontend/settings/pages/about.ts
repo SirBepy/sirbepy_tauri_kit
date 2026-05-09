@@ -37,6 +37,7 @@ interface AboutState {
   tapCount: number;
   lastTapAt: number;
   debugUnlocked: boolean;
+  checking: boolean;
 }
 
 const TAP_WINDOW_MS = 3000;
@@ -48,6 +49,19 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
     tapCount: 0,
     lastTapAt: 0,
     debugUnlocked: localStorage.getItem(DEBUG_STORAGE_KEY) === "1",
+    checking: false,
+  };
+
+  const onCheckClick = async () => {
+    if (state.checking) return;
+    state.checking = true;
+    deps.onRerender?.();
+    try {
+      await deps.onCheckNow();
+    } finally {
+      state.checking = false;
+      deps.onRerender?.();
+    }
   };
 
   const onVersionTap = () => {
@@ -102,8 +116,11 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
             class="kit-btn-secondary"
             style="width: 100%"
             data-action="check-now"
-            @click=${() => void deps.onCheckNow()}
-          >↻ Check for updates now</button>
+            ?disabled=${state.checking}
+            @click=${() => void onCheckClick()}
+          >${state.checking
+            ? html`<i class="ph ph-circle-notch kit-spin"></i> Checking…`
+            : html`↻ Check for updates now`}</button>
         </div>
 
         ${state.debugUnlocked
