@@ -3,7 +3,7 @@
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   background: var(--kit-bg);
   color: var(--kit-text);
-  min-height: 100vh;
+  min-height: 100%;
   position: relative;
   overflow-x: hidden;
 }
@@ -12,7 +12,7 @@
 .kit-stack {
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
 }
 .kit-page {
   position: absolute;
