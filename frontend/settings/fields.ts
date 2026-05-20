@@ -71,11 +71,10 @@ export function fieldRow(
           <select
             data-key=${field.key}
             class="kit-select"
-            .value=${String(value ?? "")}
             @change=${(e: Event) => onChange((e.target as HTMLSelectElement).value)}
           >
             ${field.options.map(
-              (opt) => html`<option value=${opt.value}>${opt.label}</option>`,
+              (opt) => html`<option value=${opt.value} ?selected=${opt.value === String(value ?? "")}>${opt.label}</option>`,
             )}
           </select>
         </label>
