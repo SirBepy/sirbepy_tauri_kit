@@ -18,12 +18,6 @@ export function rootPage(deps: RootDeps): PageDef {
     id: "root",
     title: "Settings",
     render: () => html`
-      <header class="kit-header">
-        <span class="kit-header-spacer"></span>
-        <h2 class="kit-header-title">Settings</h2>
-        <span class="kit-header-spacer"></span>
-      </header>
-
       ${deps.schema.sections.length > 0
         ? html`
             <div class="kit-section">
