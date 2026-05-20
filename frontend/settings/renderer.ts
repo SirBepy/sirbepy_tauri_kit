@@ -134,7 +134,6 @@ export async function renderSettingsPage(
         version,
         developer,
         autoUpdate: ((current["__kit_auto_update"] as AutoUpdateMode) ?? "onStartup"),
-        lastChecked: null, // future: kit caches last check timestamp
         onAutoUpdateChange: (m) => void setField("__kit_auto_update", m),
         onCheckNow: async () => {
           const { checkAndPromptUpdate } = await import("../updater/check");
@@ -203,19 +202,8 @@ export async function renderSettingsPage(
   stack.push(
     rootPage({
       schema: opts.schema,
-      systemInline: opts.systemInline ?? [],
-      dangerActions: opts.dangerActions ?? [],
-      current,
-      get theme() {
-        return (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
-      },
-      onChange: setField,
       onNavSection: navSection,
-      onThemeChange,
-      onNavAbout: navAboutSync,
       onNavSystem: navSystem,
-      onReset,
-      onDanger,
     }),
   );
 

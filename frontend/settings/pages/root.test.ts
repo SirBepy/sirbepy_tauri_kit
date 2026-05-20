@@ -1,9 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render } from "lit-html";
 import { rootPage } from "./root";
-import type { DangerAction } from "../renderer";
 import type { SettingsSchema } from "../schema";
-import type { Field } from "../schema";
 
 describe("rootPage", () => {
   let root: HTMLElement;
@@ -23,17 +21,8 @@ describe("rootPage", () => {
     };
     return {
       schema,
-      systemInline: [] as Field[],
-      dangerActions: [] as DangerAction[],
-      current: {} as Record<string, unknown>,
-      theme: "system" as const,
-      onChange: () => {},
       onNavSection: () => {},
-      onThemeChange: () => {},
-      onNavAbout: () => {},
       onNavSystem: () => {},
-      onReset: () => {},
-      onDanger: () => {},
       ...overrides,
     };
   }

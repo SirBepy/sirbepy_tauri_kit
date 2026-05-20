@@ -1,31 +1,12 @@
 import { html } from "lit-html";
-import type { Section, SettingsSchema, Field } from "../schema";
+import type { Section, SettingsSchema } from "../schema";
 import type { PageDef } from "../stack";
-import type { DangerAction } from "../renderer";
-import type { ThemeValue } from "./theme";
+import { navRow } from "./parts";
 
 export interface RootDeps {
   schema: SettingsSchema;
-  systemInline: Field[];
-  dangerActions: DangerAction[];
-  current: Record<string, unknown>;
-  theme: ThemeValue;
-  onChange: (key: string, value: unknown) => void;
   onNavSection: (section: Section) => void;
-  onThemeChange: (theme: ThemeValue) => void;
-  onNavAbout: () => void;
   onNavSystem: () => void;
-  onReset: () => void;
-  onDanger: (action: DangerAction) => void;
-}
-
-function navRow(label: string, dataNav: string, onClick: () => void) {
-  return html`
-    <div class="kit-row kit-nav-row" data-nav=${dataNav} @click=${onClick}>
-      <span class="kit-row-label">${label}</span>
-      <span class="kit-nav-arrow">›</span>
-    </div>
-  `;
 }
 
 function sectionId(section: Section): string {

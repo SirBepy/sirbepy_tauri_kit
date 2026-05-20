@@ -3,7 +3,8 @@ import type { Field } from "../schema";
 import type { PageDef } from "../stack";
 import { fieldRow } from "../fields";
 import type { DangerAction } from "../renderer";
-import type { ThemeValue } from "./theme";
+import { THEME_OPTIONS, type ThemeValue } from "./theme";
+import { navRow } from "./parts";
 
 export interface SystemPageDeps {
   systemInline: Field[];
@@ -17,12 +18,6 @@ export interface SystemPageDeps {
   onDanger: (action: DangerAction) => void;
   onBack: () => void;
 }
-
-const THEME_OPTIONS: { value: ThemeValue; label: string }[] = [
-  { value: "system", label: "System" },
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-];
 
 export function systemPage(deps: SystemPageDeps): PageDef {
   return {
@@ -54,10 +49,7 @@ export function systemPage(deps: SystemPageDeps): PageDef {
           .map((f) =>
             fieldRow(f, deps.current[f.key], (v) => deps.onChange(f.key, v)),
           )}
-        <div class="kit-row kit-nav-row" data-nav="about" @click=${deps.onNavAbout}>
-          <span class="kit-row-label">About</span>
-          <span class="kit-nav-arrow">›</span>
-        </div>
+        ${navRow("About", "about", deps.onNavAbout)}
       </div>
 
       <div class="kit-section">

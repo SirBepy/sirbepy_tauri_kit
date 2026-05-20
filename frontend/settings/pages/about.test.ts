@@ -25,7 +25,6 @@ describe("aboutPage", () => {
       version: "1.2.3",
       developer: { name: "Tester", links: { github: "https://github.com/x" } },
       autoUpdate: "onStartup" as const,
-      lastChecked: null,
       onAutoUpdateChange: () => {},
       onCheckNow: async () => {},
       onCopyLogs: async () => {},

@@ -12,7 +12,6 @@ export interface AboutPageDeps {
     links: Record<string, string | null | undefined>;
   };
   autoUpdate: AutoUpdateMode;
-  lastChecked: Date | null;
   onAutoUpdateChange: (mode: AutoUpdateMode) => void;
   onCheckNow: () => Promise<void>;
   onCopyLogs: () => Promise<void>;
