@@ -46,7 +46,7 @@ export function systemPage(deps: SystemPageDeps): PageDef {
         ${navRow("About", "about", deps.onNavAbout)}
       </div>
 
-      <div class="kit-section">
+      <div class="kit-section kit-section--pinned-bottom">
         <div class="kit-section-title kit-section-danger">Danger zone</div>
         <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
           <button class="kit-btn-danger" data-action="reset" @click=${deps.onReset}>

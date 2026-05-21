@@ -20,10 +20,11 @@ function renderGroup(
   current: SettingsValue,
   onChange: (key: string, value: unknown) => void,
 ) {
+  const isDanger = group.title?.toLowerCase() === "danger zone";
   return html`
-    <div class="kit-section">
+    <div class=${isDanger ? "kit-section kit-section--pinned-bottom" : "kit-section"}>
       ${group.title
-        ? html`<div class="kit-section-title">${group.title}</div>`
+        ? html`<div class=${"kit-section-title" + (isDanger ? " kit-section-danger" : "")}>${group.title}</div>`
         : null}
       ${renderFields(group.fields, current, onChange)}
     </div>
