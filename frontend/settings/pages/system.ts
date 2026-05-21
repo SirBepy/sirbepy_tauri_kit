@@ -24,12 +24,6 @@ export function systemPage(deps: SystemPageDeps): PageDef {
     id: "system",
     title: "System",
     render: () => html`
-      <header class="kit-header">
-        <button class="kit-header-back" @click=${deps.onBack}>‹ Settings</button>
-        <h2 class="kit-header-title">System</h2>
-        <span class="kit-header-spacer"></span>
-      </header>
-
       <div class="kit-section">
         <label class="kit-row" data-row="theme">
           <span class="kit-row-label">Theme</span>

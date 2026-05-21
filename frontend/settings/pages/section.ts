@@ -41,11 +41,6 @@ export function sectionPage(
     id: `section-${section.title.toLowerCase().replace(/\s+/g, "-")}`,
     title: section.title,
     render: () => html`
-      <header class="kit-header">
-        <button class="kit-header-back" @click=${onBack}>‹ Settings</button>
-        <h2 class="kit-header-title">${section.title}</h2>
-        <span class="kit-header-spacer"></span>
-      </header>
       ${section.groups
         ? section.groups.map((g) => renderGroup(g, current, onChange))
         : html`

@@ -9,6 +9,8 @@ export interface PageDef {
 /** In-memory page stack. Renders only the topmost page; emits state to root element. */
 export class PageStack {
   private stack: PageDef[] = [];
+  onPageChange?: (page: PageDef, depth: number, pop: () => void) => void;
+
   constructor(private root: HTMLElement) {}
 
   push(page: PageDef): void {
@@ -51,6 +53,7 @@ export class PageStack {
       render(html``, this.root);
       return;
     }
+    this.onPageChange?.(active, this.stack.length, () => this.pop());
     render(
       html`
         <div class="kit-stack">

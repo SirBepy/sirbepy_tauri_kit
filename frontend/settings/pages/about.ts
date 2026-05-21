@@ -82,12 +82,6 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
     id: "about",
     title: "About",
     render: () => html`
-      <header class="kit-header">
-        <button class="kit-header-back" @click=${deps.onBack}>‹ Settings</button>
-        <h2 class="kit-header-title">About</h2>
-        <span class="kit-header-spacer"></span>
-      </header>
-
       <div class="kit-about-page">
       <div class="kit-about-hero">
         <div class="kit-about-app-name">${deps.appName}</div>

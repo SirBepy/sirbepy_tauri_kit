@@ -41,6 +41,7 @@ export interface RenderOptions {
   savedEvent?: string;
   onSaved?: (settings: Record<string, unknown>) => void;
   closeOnSave?: boolean;
+  onHeaderChange?: (title: string, depth: number, pop: () => void) => void;
 }
 
 const KIT_DEFAULTS = {
@@ -73,6 +74,7 @@ export async function renderSettingsPage(
   stackRoot.className = "kit-settings";
   root.replaceChildren(stackRoot);
   const stack = new PageStack(stackRoot);
+  if (opts.onHeaderChange) stack.onPageChange = opts.onHeaderChange;
 
   // Modal layer (separate from stack, overlays everything).
   const modalRoot = document.createElement("div");
