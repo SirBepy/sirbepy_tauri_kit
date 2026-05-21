@@ -1,6 +1,10 @@
 /* ==== ROOT CONTAINER ==== */
 .kit-settings {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   background: var(--kit-bg);
   color: var(--kit-text);
   height: 100%;
@@ -30,7 +34,7 @@
 }
 
 /* Pinned to bottom of its page (danger zones) */
-.kit-section--pinned-bottom {
+.kit-section.kit-section--pinned-bottom {
   margin-top: auto;
 }
 .kit-page.kit-page-entering {
@@ -65,7 +69,9 @@
   text-align: left;
   padding: 4px 0;
 }
-.kit-header-back:hover { color: var(--kit-text); }
+.kit-header-back:hover {
+  color: var(--kit-text);
+}
 .kit-header-title {
   flex: 1;
   text-align: center;
@@ -73,7 +79,9 @@
   font-weight: 600;
   margin: 0;
 }
-.kit-header-spacer { width: 80px; }
+.kit-header-spacer {
+  width: 80px;
+}
 
 /* ==== SECTIONS ==== */
 .kit-section {
