@@ -74,7 +74,10 @@ export async function renderSettingsPage(
   stackRoot.className = "kit-settings";
   root.replaceChildren(stackRoot);
   const stack = new PageStack(stackRoot);
-  if (opts.onHeaderChange) stack.onPageChange = opts.onHeaderChange;
+  if (opts.onHeaderChange) {
+    const cb = opts.onHeaderChange;
+    stack.onPageChange = (page, depth, pop) => cb(page.title, depth, pop);
+  }
 
   // Modal layer (separate from stack, overlays everything).
   const modalRoot = document.createElement("div");
