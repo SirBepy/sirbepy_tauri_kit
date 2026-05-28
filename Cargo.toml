@@ -3,6 +3,8 @@ resolver = "2"
 members = [
   "tauri/settings",
   "tauri/updater",
+  "tauri/window",
+  "tauri/meeting",
 ]
 
 [workspace.package]

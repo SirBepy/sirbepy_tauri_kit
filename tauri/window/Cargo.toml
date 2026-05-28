@@ -1,0 +1,17 @@
+[package]
+name = "tauri_kit_window"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+tauri = { version = "2.0" }
+log = "0.4"
+raw-window-handle = "0.6"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.58", features = [
+    "Win32_Foundation",
+    "Win32_UI_WindowsAndMessaging",
+] }
