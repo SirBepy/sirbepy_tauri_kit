@@ -123,7 +123,20 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
                   class="kit-btn-secondary"
                   style="width: 100%"
                   data-action="copy-logs"
-                  @click=${() => void deps.onCopyLogs()}
+                  @click=${async (e: MouseEvent) => {
+                    const btn = e.currentTarget as HTMLButtonElement;
+                    const orig = btn.textContent;
+                    try {
+                      await deps.onCopyLogs();
+                      btn.textContent = "Copied!";
+                    } catch (err) {
+                      console.error("copy logs failed", err);
+                      btn.textContent = "Copy failed";
+                    }
+                    setTimeout(() => {
+                      if (document.contains(btn)) btn.textContent = orig;
+                    }, 1500);
+                  }}
                 >Copy debug logs</button>
               </div>
             `
