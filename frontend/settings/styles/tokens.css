@@ -1,6 +1,10 @@
 /*
  * sirbepy_tauri_kit settings design system
  * Theme via [data-theme="..."] attribute on <html>.
+ *
+ * Core ships a neutral light/dark/system theme. Apps that want named palettes
+ * opt into a preset (e.g. palettes/sirbepy-default.css), which adds
+ * [data-theme="<palette>"] / [data-theme="<palette>-light"] blocks.
  */
 
 /* ==== RESET ==== */

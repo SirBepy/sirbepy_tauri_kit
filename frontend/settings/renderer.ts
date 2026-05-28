@@ -6,7 +6,7 @@ import type { SettingsSchema, Section, Field } from "./schema";
 import { PageStack } from "./stack";
 import { rootPage } from "./pages/root";
 import { sectionPage } from "./pages/section";
-import { applyTheme, type ThemeValue } from "./pages/theme";
+import { applyTheme, DEFAULT_MODE, type PaletteDef, type ThemeValue } from "./pages/theme";
 import { aboutPage, type AutoUpdateMode } from "./pages/about";
 import { systemPage } from "./pages/system";
 import { resetModal } from "./pages/reset-modal";
@@ -27,7 +27,10 @@ export interface AboutConfig {
 }
 
 export interface ThemeConfig {
+  /** Default mode (light/dark/system). */
   default?: ThemeValue;
+  /** Default palette id. Only meaningful when `palettes` is provided. */
+  defaultPalette?: string;
 }
 
 export interface RenderOptions {
@@ -36,6 +39,8 @@ export interface RenderOptions {
   dangerActions?: DangerAction[];
   about?: AboutConfig;
   theme?: ThemeConfig;
+  /** Opt-in named palettes. When provided, the System page shows a palette picker. */
+  palettes?: PaletteDef[];
   loadCommand?: string;
   saveCommand?: string;
   savedEvent?: string;
@@ -64,8 +69,18 @@ export async function renderSettingsPage(
   const saveCmd = opts.saveCommand ?? "save_settings";
   const savedEvent = opts.savedEvent ?? "settings-updated";
 
+  const palettes = opts.palettes ?? [];
+  const hasPalettes = palettes.length > 0;
+  const defaultMode = opts.theme?.default ?? DEFAULT_MODE;
+  const defaultPalette = hasPalettes
+    ? (opts.theme?.defaultPalette ?? palettes[0].id)
+    : undefined;
+  const modeOf = (s: SettingsValue) => (s["__kit_theme"] as ThemeValue) ?? defaultMode;
+  const paletteOf = (s: SettingsValue): string | undefined =>
+    hasPalettes ? ((s["__kit_palette"] as string) ?? defaultPalette) : undefined;
+
   // Apply default theme before first paint to avoid a light-flash on dark setups.
-  applyTheme(opts.theme?.default ?? "system");
+  applyTheme(defaultMode, defaultPalette);
 
   // Synchronous DOM scaffold + first paint with empty values.
   // Settings hydrate asynchronously below; sections list is schema-driven and renders immediately.
@@ -88,8 +103,7 @@ export async function renderSettingsPage(
   const hydrated = (async () => {
     const initial = (await invoke<SettingsValue>(loadCmd)) ?? {};
     current = { ...initial };
-    const theme = (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
-    applyTheme(theme);
+    applyTheme(modeOf(current), paletteOf(current));
     stack.rerender();
   })();
 
@@ -110,8 +124,13 @@ export async function renderSettingsPage(
   };
 
   const onThemeChange = async (t: ThemeValue) => {
-    applyTheme(t);
+    applyTheme(t, paletteOf(current));
     await setField("__kit_theme", t);
+  };
+
+  const onPaletteChange = async (p: string) => {
+    applyTheme(modeOf(current), p);
+    await setField("__kit_palette", p);
   };
 
   const navAbout = async () => {
@@ -189,11 +208,16 @@ export async function renderSettingsPage(
         systemInline: opts.systemInline ?? [],
         dangerActions: opts.dangerActions ?? [],
         current,
+        palettes,
         get theme() {
-          return (current["__kit_theme"] as ThemeValue) ?? opts.theme?.default ?? "system";
+          return modeOf(current);
+        },
+        get palette() {
+          return paletteOf(current);
         },
         onChange: setField,
         onThemeChange,
+        onPaletteChange,
         onNavAbout: navAboutSync,
         onReset,
         onDanger,
@@ -218,7 +242,7 @@ export async function renderSettingsPage(
   void listen("settings-reset", async () => {
     const fresh = (await invoke<SettingsValue>(loadCmd)) ?? {};
     current = { ...fresh };
-    applyTheme((current["__kit_theme"] as ThemeValue) ?? "system");
+    applyTheme(modeOf(current), paletteOf(current));
     stack.rerender();
   }).then((fn) => { unlisten = fn; });
 

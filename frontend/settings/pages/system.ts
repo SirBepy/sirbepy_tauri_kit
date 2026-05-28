@@ -3,7 +3,7 @@ import type { Field } from "../schema";
 import type { PageDef } from "../stack";
 import { fieldRow } from "../fields";
 import type { DangerAction } from "../renderer";
-import { THEME_OPTIONS, type ThemeValue } from "./theme";
+import { THEME_OPTIONS, type PaletteDef, type ThemeValue } from "./theme";
 import { navRow } from "./parts";
 
 export interface SystemPageDeps {
@@ -11,8 +11,11 @@ export interface SystemPageDeps {
   dangerActions: DangerAction[];
   current: Record<string, unknown>;
   theme: ThemeValue;
+  palettes: PaletteDef[];
+  palette: string | undefined;
   onChange: (key: string, value: unknown) => void;
   onThemeChange: (theme: ThemeValue) => void;
+  onPaletteChange: (palette: string) => void;
   onNavAbout: () => void;
   onReset: () => void;
   onDanger: (action: DangerAction) => void;
@@ -38,6 +41,32 @@ export function systemPage(deps: SystemPageDeps): PageDef {
             )}
           </select>
         </label>
+        ${deps.palettes.length
+          ? html`
+              <div class="kit-row kit-row--column" data-row="palette">
+                <span class="kit-row-label">Palette</span>
+                <div class="kit-palette-grid">
+                  ${deps.palettes.map((p) => {
+                    const swatch = deps.theme === "light" ? p.lightSwatch : p.darkSwatch;
+                    return html`
+                      <button
+                        type="button"
+                        class=${`kit-palette-card ${p.id === deps.palette ? "kit-palette-card--active" : ""}`}
+                        data-palette=${p.id}
+                        title=${p.label}
+                        @click=${() => deps.onPaletteChange(p.id)}
+                      >
+                        <span class="kit-palette-swatch">
+                          ${swatch.map((c) => html`<span style=${`background:${c}`}></span>`)}
+                        </span>
+                        <span class="kit-palette-label">${p.label}</span>
+                      </button>
+                    `;
+                  })}
+                </div>
+              </div>
+            `
+          : null}
         ${deps.systemInline
           .filter((f) => !f.visibleWhen || f.visibleWhen(deps.current))
           .map((f) =>

@@ -127,3 +127,48 @@
   gap: 8px;
   justify-content: flex-end;
 }
+
+/* ==== PALETTE PICKER ==== */
+.kit-row--column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.kit-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.kit-palette-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border: 1px solid var(--kit-border);
+  border-radius: 8px;
+  background: var(--kit-bg-alt);
+  color: var(--kit-text-dim);
+  cursor: pointer;
+  font: inherit;
+}
+.kit-palette-card:hover {
+  background: var(--kit-bg-hover);
+}
+.kit-palette-card--active {
+  border-color: var(--kit-accent);
+  color: var(--kit-text);
+}
+.kit-palette-swatch {
+  display: flex;
+  width: 100%;
+  height: 22px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.kit-palette-swatch > span {
+  flex: 1;
+}
+.kit-palette-label {
+  font-size: 12px;
+}

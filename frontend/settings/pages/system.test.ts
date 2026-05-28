@@ -19,8 +19,11 @@ describe("systemPage", () => {
       dangerActions: [] as DangerAction[],
       current: {} as Record<string, unknown>,
       theme: "system" as const,
+      palettes: [],
+      palette: undefined,
       onChange: () => {},
       onThemeChange: () => {},
+      onPaletteChange: () => {},
       onNavAbout: () => {},
       onReset: () => {},
       onDanger: () => {},
@@ -104,5 +107,37 @@ describe("systemPage", () => {
     const logoutBtn = root.querySelectorAll<HTMLButtonElement>(".kit-btn-danger")[1];
     logoutBtn.click();
     expect(calls).toEqual(["logout"]);
+  });
+
+  const samplePalettes = [
+    { id: "void", label: "Void", darkSwatch: ["#16151f"], lightSwatch: ["#f0eff5"] },
+    { id: "cosmo", label: "Cosmo", darkSwatch: ["#1a0a1e"], lightSwatch: ["#faf0f4"] },
+  ];
+
+  it("renders no palette picker when no palettes are provided", () => {
+    const page = systemPage(defaultDeps());
+    render(page.render(), root);
+    expect(root.querySelector('[data-row="palette"]')).toBeFalsy();
+  });
+
+  it("renders a palette card per provided palette and marks the active one", () => {
+    const page = systemPage(defaultDeps({ palettes: samplePalettes, palette: "cosmo" }));
+    render(page.render(), root);
+    const cards = root.querySelectorAll(".kit-palette-card");
+    expect(cards.length).toBe(2);
+    const active = root.querySelector(".kit-palette-card--active");
+    expect(active?.getAttribute("data-palette")).toBe("cosmo");
+  });
+
+  it("clicking a palette card calls onPaletteChange with its id", () => {
+    const calls: string[] = [];
+    const page = systemPage(defaultDeps({
+      palettes: samplePalettes,
+      palette: "void",
+      onPaletteChange: (p) => calls.push(p),
+    }));
+    render(page.render(), root);
+    root.querySelector<HTMLButtonElement>('[data-palette="cosmo"]')!.click();
+    expect(calls).toEqual(["cosmo"]);
   });
 });
