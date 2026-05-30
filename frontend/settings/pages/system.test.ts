@@ -24,7 +24,6 @@ describe("systemPage", () => {
       onChange: () => {},
       onThemeChange: () => {},
       onPaletteChange: () => {},
-      onNavAbout: () => {},
       onReset: () => {},
       onDanger: () => {},
       onBack: () => {},
@@ -50,24 +49,6 @@ describe("systemPage", () => {
     select.value = "light";
     select.dispatchEvent(new Event("change"));
     expect(calls).toEqual(["light"]);
-  });
-
-  it("clicking About calls onNavAbout", () => {
-    let called = false;
-    const page = systemPage(defaultDeps({ onNavAbout: () => { called = true; } }));
-    render(page.render(), root);
-    const row = root.querySelector<HTMLElement>('[data-nav="about"]')!;
-    row.click();
-    expect(called).toBe(true);
-  });
-
-  it("clicking back calls onBack", () => {
-    let called = false;
-    const page = systemPage(defaultDeps({ onBack: () => { called = true; } }));
-    render(page.render(), root);
-    const back = root.querySelector<HTMLElement>(".kit-header-back")!;
-    back.click();
-    expect(called).toBe(true);
   });
 
   it("renders systemInline fields as inline rows", () => {

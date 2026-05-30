@@ -23,16 +23,17 @@ describe("rootPage", () => {
       schema,
       onNavSection: () => {},
       onNavSystem: () => {},
+      onNavAbout: () => {},
       ...overrides,
     };
   }
 
-  it("renders one nav-row per schema section plus a System nav-row", () => {
+  it("renders one nav-row per schema section plus System and About nav-rows", () => {
     const page = rootPage(defaultDeps());
     render(page.render(), root);
     const navRows = root.querySelectorAll(".kit-nav-row");
-    // schema sections (2) + System (1) = 3
-    expect(navRows.length).toBe(3);
+    // schema sections (2) + System (1) + About (1) = 4
+    expect(navRows.length).toBe(4);
   });
 
   it("clicking schema section calls onNavSection with that section", () => {
@@ -53,10 +54,19 @@ describe("rootPage", () => {
     expect(called).toBe(true);
   });
 
-  it("System nav-row appears even with empty schema", () => {
+  it("clicking About nav-row calls onNavAbout", () => {
+    let called = false;
+    const page = rootPage(defaultDeps({ onNavAbout: () => { called = true; } }));
+    render(page.render(), root);
+    const row = root.querySelector<HTMLElement>('[data-nav="about"]')!;
+    row.click();
+    expect(called).toBe(true);
+  });
+
+  it("System and About nav-rows appear even with empty schema", () => {
     const page = rootPage(defaultDeps({ schema: { sections: [] } }));
     render(page.render(), root);
-    const row = root.querySelector<HTMLElement>('[data-nav="system"]');
-    expect(row).toBeTruthy();
+    expect(root.querySelector<HTMLElement>('[data-nav="system"]')).toBeTruthy();
+    expect(root.querySelector<HTMLElement>('[data-nav="about"]')).toBeTruthy();
   });
 });

@@ -4,7 +4,6 @@ import type { PageDef } from "../stack";
 import { fieldRow } from "../fields";
 import type { DangerAction } from "../renderer";
 import { THEME_OPTIONS, type PaletteDef, type ThemeValue } from "./theme";
-import { navRow } from "./parts";
 
 export interface SystemPageDeps {
   systemInline: Field[];
@@ -16,7 +15,6 @@ export interface SystemPageDeps {
   onChange: (key: string, value: unknown) => void;
   onThemeChange: (theme: ThemeValue) => void;
   onPaletteChange: (palette: string) => void;
-  onNavAbout: () => void;
   onReset: () => void;
   onDanger: (action: DangerAction) => void;
   onBack: () => void;
@@ -72,7 +70,6 @@ export function systemPage(deps: SystemPageDeps): PageDef {
           .map((f) =>
             fieldRow(f, deps.current[f.key], (v) => deps.onChange(f.key, v)),
           )}
-        ${navRow("About", "about", deps.onNavAbout)}
       </div>
 
       <div class="kit-section kit-section--pinned-bottom">

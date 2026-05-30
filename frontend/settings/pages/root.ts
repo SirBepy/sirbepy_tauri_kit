@@ -7,17 +7,18 @@ export interface RootDeps {
   schema: SettingsSchema;
   onNavSection: (section: Section) => void;
   onNavSystem: () => void;
+  onNavAbout: () => void;
 }
 
 function sectionId(section: Section): string {
   return `section-${section.title.toLowerCase().replace(/\s+/g, "-")}`;
 }
 
-/** Category label -> which schema section titles belong there. System is always appended to the last group. */
+/** Category label -> which schema section titles belong there. System and About are always appended to the last group. */
 const SECTION_CATEGORIES: { label: string; titles: string[] }[] = [
   { label: "Pomodoro", titles: ["Timer", "Focus mode", "Meeting mode"] },
   { label: "Preferences", titles: ["Overlay", "Sound", "Keybinds"] },
-  { label: "Data", titles: ["Stats"] },
+  { label: "General", titles: ["Stats"] },
 ];
 
 export function rootPage(deps: RootDeps): PageDef {
@@ -28,6 +29,7 @@ export function rootPage(deps: RootDeps): PageDef {
       render: () => html`
         <div class="kit-section">
           ${navRow("System", "system", deps.onNavSystem)}
+          ${navRow("About", "about", deps.onNavAbout)}
         </div>
       `,
     };
@@ -55,6 +57,7 @@ export function rootPage(deps: RootDeps): PageDef {
               navRow(section.title, sectionId(section), () => deps.onNavSection(section)),
             )}
             ${isLast ? navRow("System", "system", deps.onNavSystem) : null}
+            ${isLast ? navRow("About", "about", deps.onNavAbout) : null}
           </div>
         `;
       })}

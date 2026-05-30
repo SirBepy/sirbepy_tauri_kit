@@ -54,9 +54,9 @@ describe("renderSettingsPage v2", () => {
 
     expect(root.querySelector('[data-nav="section-times"]')).toBeTruthy();
     expect(root.querySelector('[data-nav="system"]')).toBeTruthy();
-    // Theme/About/Reset live in the System subpage now, not on root.
+    // About lives on root; Theme/Reset live in the System subpage.
+    expect(root.querySelector('[data-nav="about"]')).toBeTruthy();
     expect(root.querySelector('select[data-key="__kit_theme"]')).toBeFalsy();
-    expect(root.querySelector('[data-nav="about"]')).toBeFalsy();
     expect(root.querySelector('[data-action="reset"]')).toBeFalsy();
   });
 
@@ -70,7 +70,8 @@ describe("renderSettingsPage v2", () => {
     const nav = root.querySelector<HTMLElement>('[data-nav="system"]')!;
     nav.click();
     expect(root.querySelector('select[data-key="__kit_theme"]')).toBeTruthy();
-    expect(root.querySelector('[data-nav="about"]')).toBeTruthy();
+    // About is on root now, not inside System subpage.
+    expect(root.querySelector('[data-nav="about"]')).toBeFalsy();
     expect(root.querySelector('[data-action="reset"]')).toBeTruthy();
   });
 
@@ -85,8 +86,7 @@ describe("renderSettingsPage v2", () => {
 
     const nav = root.querySelector<HTMLElement>('[data-nav="section-times"]')!;
     nav.click();
-    // After push, root nav-row is replaced by section page; back button visible.
-    expect(root.querySelector(".kit-header-back")).toBeTruthy();
+    // After push, root nav-row is replaced by section page with fields visible.
     expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
   });
 

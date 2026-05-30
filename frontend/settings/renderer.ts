@@ -218,7 +218,6 @@ export async function renderSettingsPage(
         onChange: setField,
         onThemeChange,
         onPaletteChange,
-        onNavAbout: navAboutSync,
         onReset,
         onDanger,
         onBack: () => stack.pop(),
@@ -233,6 +232,7 @@ export async function renderSettingsPage(
       schema: opts.schema,
       onNavSection: navSection,
       onNavSystem: navSystem,
+      onNavAbout: navAboutSync,
     }),
   );
 

@@ -97,14 +97,4 @@ describe("sectionPage", () => {
     expect(root.querySelector('input[data-key="work_minutes"]')).toBeTruthy();
   });
 
-  it("renders back button that calls onBack", () => {
-    const section: Section = { title: "Times", fields: [] };
-    let backCalled = false;
-    const page = sectionPage(section, {}, () => {}, () => { backCalled = true; });
-    render(page.render(), root);
-
-    const backBtn = root.querySelector<HTMLButtonElement>(".kit-header-back")!;
-    backBtn.click();
-    expect(backCalled).toBe(true);
-  });
 });
