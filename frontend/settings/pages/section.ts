@@ -36,7 +36,7 @@ export function sectionPage(
   section: Section,
   current: SettingsValue,
   onChange: (key: string, value: unknown) => void,
-  onBack: () => void,
+  _onBack: () => void,
 ): PageDef {
   return {
     id: `section-${section.title.toLowerCase().replace(/\s+/g, "-")}`,
