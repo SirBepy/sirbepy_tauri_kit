@@ -74,14 +74,14 @@ export function systemPage(deps: SystemPageDeps): PageDef {
 
       <div class="kit-section kit-section--pinned-bottom">
         <div class="kit-section-title kit-section-danger">Danger zone</div>
-        <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
+        <div class="kit-row">
           <button class="kit-btn-danger" data-action="reset" @click=${deps.onReset}>
             Reset all settings
           </button>
         </div>
         ${deps.dangerActions.map(
           (a) => html`
-            <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
+            <div class="kit-row">
               <button
                 class="kit-btn-danger"
                 data-action=${`danger-${a.command}`}

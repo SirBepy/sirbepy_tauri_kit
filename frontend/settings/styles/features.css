@@ -144,31 +144,34 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 8px 4px;
-  border: 1px solid var(--kit-border);
+  padding: 10px;
+  border: 2px solid var(--color-border);
   border-radius: 8px;
-  background: var(--kit-bg-alt);
-  color: var(--kit-text-dim);
+  background: transparent;
+  color: var(--color-text-muted);
   cursor: pointer;
   font: inherit;
+  transition: border-color 0.15s;
 }
 .kit-palette-card:hover {
-  background: var(--kit-bg-hover);
+  border-color: var(--color-text-muted);
 }
 .kit-palette-card--active {
-  border-color: var(--kit-accent);
-  color: var(--kit-text);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 .kit-palette-swatch {
   display: flex;
+  gap: 3px;
   width: 100%;
-  height: 22px;
-  border-radius: 5px;
+  height: 24px;
+  border-radius: 4px;
   overflow: hidden;
 }
 .kit-palette-swatch > span {
   flex: 1;
 }
 .kit-palette-label {
-  font-size: 12px;
+  font-size: 0.72rem;
+  font-weight: 500;
 }
