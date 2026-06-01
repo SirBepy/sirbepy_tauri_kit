@@ -1,152 +1,21 @@
 /*
  * sirbepy_tauri_kit — SirBepy default palette preset (OPT-IN).
- * Import this only if your app uses the SIRBEPY_PALETTES list. Each block fully
- * overrides the kit's --kit-* tokens for one palette × mode. data-theme is set
- * to "<palette>" (dark) or "<palette>-light" by pages/theme.ts applyTheme.
+ * Import this only if your app uses the SIRBEPY_PALETTES list.
  *
- * danger-zone tints + scrollbar tints are shared by lightness, not palette.
+ * Sources the vendored styleguide theme tokens (the single source of truth for
+ * palette values). Each theme file defines the --color-* tokens for one palette
+ * using the styleguide's 2D convention: `[data-theme="<palette>"]` (dark) and
+ * `[data-theme="<palette>"][data-mode="light"]` (light). pages/theme.ts
+ * applyTheme sets data-theme + data-mode accordingly; the kit's --kit-* aliases
+ * (styles/tokens.css) map onto these --color-* values.
+ *
+ * danger-zone tints + scrollbar tints are lightness-keyed (not palette-keyed)
+ * and live in styles/tokens.css.
+ *
+ * Refresh the vendored copies with scripts/sync-styleguide.ps1.
  */
 
-/* Void */
-[data-theme="void"] {
-  --kit-bg: #16151f;
-  --kit-bg-alt: #1e1d2b;
-  --kit-bg-hover: #242334;
-  --kit-text: #e2e0f0;
-  --kit-text-dim: #6b6990;
-  --kit-accent: #9d7dfc;
-  --kit-accent-hover: #6e8fff;
-  --kit-danger: #e05252;
-  --kit-danger-bg: #3a1a1a;
-  --kit-danger-border: #6a2a2a;
-  --kit-border: #2d2c44;
-  --scrollbar-thumb:       rgba(255, 255, 255, 0.18);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-[data-theme="void-light"] {
-  --kit-bg: #f0eff5;
-  --kit-bg-alt: #ffffff;
-  --kit-bg-hover: #e8e6f0;
-  --kit-text: #1e1d2b;
-  --kit-text-dim: #8b87a8;
-  --kit-accent: #7c5cdb;
-  --kit-accent-hover: #4a6bdf;
-  --kit-danger: #d43f3f;
-  --kit-danger-bg: #fde9e9;
-  --kit-danger-border: #f5b5b5;
-  --kit-border: #d4d2e0;
-  --scrollbar-thumb:       rgba(0, 0, 0, 0.22);
-  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-
-/* Nebula */
-[data-theme="nebula"] {
-  --kit-bg: #0f1629;
-  --kit-bg-alt: #172040;
-  --kit-bg-hover: #1d2850;
-  --kit-text: #e2dff0;
-  --kit-text-dim: #6e6b99;
-  --kit-accent: #c084fc;
-  --kit-accent-hover: #a78bfa;
-  --kit-danger: #f06060;
-  --kit-danger-bg: #3a1a1a;
-  --kit-danger-border: #6a2a2a;
-  --kit-border: #2a3060;
-  --scrollbar-thumb:       rgba(255, 255, 255, 0.18);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-[data-theme="nebula-light"] {
-  --kit-bg: #f2f0fa;
-  --kit-bg-alt: #ffffff;
-  --kit-bg-hover: #ece8f8;
-  --kit-text: #1a1040;
-  --kit-text-dim: #8b7fba;
-  --kit-accent: #9333ea;
-  --kit-accent-hover: #7c3aed;
-  --kit-danger: #dc2626;
-  --kit-danger-bg: #fde9e9;
-  --kit-danger-border: #f5b5b5;
-  --kit-border: #d8d0f0;
-  --scrollbar-thumb:       rgba(0, 0, 0, 0.22);
-  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-
-/* Glacier */
-[data-theme="glacier"] {
-  --kit-bg: #0c1a24;
-  --kit-bg-alt: #112430;
-  --kit-bg-hover: #162e3c;
-  --kit-text: #e0f0f8;
-  --kit-text-dim: #5e8fa0;
-  --kit-accent: #38bdf8;
-  --kit-accent-hover: #22d3ee;
-  --kit-danger: #f87171;
-  --kit-danger-bg: #3a1a1a;
-  --kit-danger-border: #6a2a2a;
-  --kit-border: #1e3a4c;
-  --scrollbar-thumb:       rgba(255, 255, 255, 0.18);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-[data-theme="glacier-light"] {
-  --kit-bg: #eef6fa;
-  --kit-bg-alt: #ffffff;
-  --kit-bg-hover: #e0f0f6;
-  --kit-text: #0c2430;
-  --kit-text-dim: #6a9aac;
-  --kit-accent: #0284c7;
-  --kit-accent-hover: #0891b2;
-  --kit-danger: #dc2626;
-  --kit-danger-bg: #fde9e9;
-  --kit-danger-border: #f5b5b5;
-  --kit-border: #c4dce8;
-  --scrollbar-thumb:       rgba(0, 0, 0, 0.22);
-  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-
-/* Cosmo */
-[data-theme="cosmo"] {
-  --kit-bg: #1a0a1e;
-  --kit-bg-alt: #241430;
-  --kit-bg-hover: #2e1a3c;
-  --kit-text: #f0e4f5;
-  --kit-text-dim: #8a6898;
-  --kit-accent: #f472b6;
-  --kit-accent-hover: #fb923c;
-  --kit-danger: #fb7185;
-  --kit-danger-bg: #3a1a1a;
-  --kit-danger-border: #6a2a2a;
-  --kit-border: #3a2248;
-  --scrollbar-thumb:       rgba(255, 255, 255, 0.18);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
-[data-theme="cosmo-light"] {
-  --kit-bg: #faf0f4;
-  --kit-bg-alt: #ffffff;
-  --kit-bg-hover: #f5e8f0;
-  --kit-text: #2a1030;
-  --kit-text-dim: #a07090;
-  --kit-accent: #db2777;
-  --kit-accent-hover: #ea580c;
-  --kit-danger: #e11d48;
-  --kit-danger-bg: #fde9e9;
-  --kit-danger-border: #f5b5b5;
-  --kit-border: #e8d0dc;
-  --scrollbar-thumb:       rgba(0, 0, 0, 0.22);
-  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
-  --scrollbar-track:       transparent;
-  --scrollbar-size:        9px;
-}
+@import url("../../styleguide/themes/theme-void.css");
+@import url("../../styleguide/themes/theme-nebula.css");
+@import url("../../styleguide/themes/theme-glacier.css");
+@import url("../../styleguide/themes/theme-cosmo.css");

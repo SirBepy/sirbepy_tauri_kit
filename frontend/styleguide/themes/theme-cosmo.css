@@ -1,0 +1,42 @@
+/* Cosmo - Dark */
+[data-theme="cosmo"] {
+  --color-primary: #f472b6;
+  --color-primary-rgb: 244, 114, 182;
+  --color-secondary: #fb923c;
+  --color-accent: #f472b6;
+  --color-background: #1a0a1e;
+  --color-surface: #241430;
+  --color-surface-alt: #2e1a3c;
+  --color-text: #f0e4f5;
+  --color-text-muted: #8a6898;
+  --color-border: #3a2248;
+  --color-success: #4ade80;
+  --color-danger: #fb7185;
+  --color-info: #fb923c;
+  --font-heading: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "Fira Code", monospace;
+  --badge-tech-bg: #2e1d2b;
+  --radius-card: 12px;
+  --radius-badge: 8px;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Cosmo - Light */
+[data-theme="cosmo"][data-mode="light"] {
+  --color-primary: #db2777;
+  --color-primary-rgb: 219, 39, 119;
+  --color-secondary: #ea580c;
+  --color-accent: #db2777;
+  --color-background: #faf0f4;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f5e8f0;
+  --color-text: #2a1030;
+  --color-text-muted: #a07090;
+  --color-border: #e8d0dc;
+  --color-success: #16a34a;
+  --color-danger: #e11d48;
+  --color-info: #ea580c;
+  --badge-tech-bg: #ece2dc;
+  --shadow-card: 0 4px 20px rgba(160,60,20,0.08);
+}
