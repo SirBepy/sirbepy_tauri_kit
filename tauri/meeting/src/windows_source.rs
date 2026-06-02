@@ -1,23 +1,27 @@
 //! Windows implementation of SignalSource.
-//! - camera/mic: read the CapabilityAccessManager ConsentStore in HKCU. Any app
-//!   subkey whose `LastUsedTimeStop` == 0 means the device is in use right now.
-//!   This is the same data behind the tray privacy icon, so it covers browser calls.
+//! - camera/mic: read the CapabilityAccessManager ConsentStore in HKCU. A subkey
+//!   whose `LastUsedTimeStop` == 0 means that app holds the device right now. We
+//!   only count subkeys belonging to a browser process: native meeting apps are
+//!   covered by the audio-session check, and an unscoped scan false-fires on any
+//!   app that parks the device (e.g. Discord holds the mic the whole time it runs).
+//!   Browsers, by contrast, only acquire the device for the duration of a call, so
+//!   browser-scoping is what catches Google Meet / Zoom-web.
 //! - audio: enumerate active audio render sessions, map each PID to a process name,
 //!   and match against the meeting-app allow list.
 
 #![cfg(windows)]
 
-use crate::signal::{process_name_matches, SignalSource};
+use crate::signal::{process_name_from_consent_key, process_name_matches, SignalSource};
 use std::collections::HashMap;
 
 pub struct WindowsSignalSource;
 
 impl SignalSource for WindowsSignalSource {
-    fn camera_in_use(&self) -> bool {
-        consent_store_in_use("webcam")
+    fn camera_in_use(&self, browsers: &[String]) -> bool {
+        consent_store_in_use("webcam", browsers)
     }
-    fn mic_in_use(&self) -> bool {
-        consent_store_in_use("microphone")
+    fn mic_in_use(&self, browsers: &[String]) -> bool {
+        consent_store_in_use("microphone", browsers)
     }
     fn meeting_app_audio_active(&self, allow: &[String]) -> bool {
         if allow.is_empty() {
@@ -48,22 +52,26 @@ fn to_wide(s: &str) -> Vec<u16> {
     s.encode_utf16().chain(std::iter::once(0)).collect()
 }
 
-/// Returns true if any app under
+/// Returns true if a browser app under
 /// `...\CapabilityAccessManager\ConsentStore\<device>` (or its `NonPackaged`
-/// subtree) currently holds the device (LastUsedTimeStop == 0).
-fn consent_store_in_use(device: &str) -> bool {
+/// subtree) currently holds the device (LastUsedTimeStop == 0). `browsers` is the
+/// process-name allow list; a non-browser app holding the device is ignored.
+fn consent_store_in_use(device: &str, browsers: &[String]) -> bool {
+    if browsers.is_empty() {
+        return false;
+    }
     let base = format!(
         "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\{device}"
     );
-    if any_child_active(&base) {
+    if any_child_active(&base, browsers) {
         return true;
     }
-    any_child_active(&format!("{base}\\NonPackaged"))
+    any_child_active(&format!("{base}\\NonPackaged"), browsers)
 }
 
 /// Open `parent`, enumerate its immediate subkeys, and return true if any subkey
-/// has a `LastUsedTimeStop` value equal to 0.
-fn any_child_active(parent: &str) -> bool {
+/// whose process name matches `browsers` has a `LastUsedTimeStop` value equal to 0.
+fn any_child_active(parent: &str, browsers: &[String]) -> bool {
     use windows::core::PCWSTR;
     use windows::Win32::Foundation::ERROR_SUCCESS;
     use windows::Win32::System::Registry::{
@@ -100,12 +108,16 @@ fn any_child_active(parent: &str) -> bool {
             break;
         }
         let child = String::from_utf16_lossy(&name_buf[..name_len as usize]);
+        index += 1;
+        // Only browser processes count; a parked device on any other app is noise.
+        if !process_name_matches(process_name_from_consent_key(&child), browsers) {
+            continue;
+        }
         let full = format!("{parent}\\{child}");
         if last_used_stop_is_zero(&full) {
             found = true;
             break;
         }
-        index += 1;
     }
     unsafe {
         let _ = RegCloseKey(hkey);

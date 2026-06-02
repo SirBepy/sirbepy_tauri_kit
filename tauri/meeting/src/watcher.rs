@@ -17,14 +17,19 @@ pub fn spawn<R: Runtime>(
     std::thread::spawn(move || {
         let mut last: Option<bool> = None;
         loop {
-            let allow: Vec<String> = app
-                .try_state::<MeetingStateStore>()
+            let store = app.try_state::<MeetingStateStore>();
+            let allow: Vec<String> = store
+                .as_ref()
                 .and_then(|s| s.apps.lock().ok().map(|g| g.clone()))
+                .unwrap_or_default();
+            let browsers: Vec<String> = store
+                .as_ref()
+                .and_then(|s| s.browsers.lock().ok().map(|g| g.clone()))
                 .unwrap_or_default();
 
             let sources = Sources {
-                camera: source.camera_in_use(),
-                mic: source.mic_in_use(),
+                camera: source.camera_in_use(&browsers),
+                mic: source.mic_in_use(&browsers),
                 audio: source.meeting_app_audio_active(&allow),
             };
             let active = compute_in_meeting(sources);

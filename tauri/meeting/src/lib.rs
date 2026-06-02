@@ -21,6 +21,10 @@ pub struct MeetingConfig {
     pub poll_interval: Duration,
     /// Process image names counted as meeting apps for the audio-session check.
     pub audio_app_names: Vec<String>,
+    /// Browser process image names counted for the camera/mic consent check.
+    /// Native meeting apps are intentionally excluded here (the audio-session
+    /// check covers them); only browsers acquire the device solely during a call.
+    pub browser_app_names: Vec<String>,
 }
 
 impl Default for MeetingConfig {
@@ -28,6 +32,7 @@ impl Default for MeetingConfig {
         Self {
             poll_interval: Duration::from_secs(3),
             audio_app_names: default_meeting_apps(),
+            browser_app_names: default_browser_apps(),
         }
     }
 }
@@ -42,6 +47,25 @@ pub fn default_meeting_apps() -> Vec<String> {
         "Discord.exe",
         "slack.exe",
         "Webex.exe",
+    ]
+    .iter()
+    .map(|s| s.to_string())
+    .collect()
+}
+
+/// Built-in browser process names for the camera/mic consent check. Browsers hold
+/// the device only for the duration of a call, so they are safe to detect this way;
+/// native meeting apps (which park the device while merely running) are not listed.
+pub fn default_browser_apps() -> Vec<String> {
+    [
+        "chrome.exe",
+        "msedge.exe",
+        "firefox.exe",
+        "brave.exe",
+        "opera.exe",
+        "vivaldi.exe",
+        "arc.exe",
+        "zen.exe",
     ]
     .iter()
     .map(|s| s.to_string())
@@ -63,6 +87,7 @@ pub(crate) struct MeetingStateStore {
     pub mic: AtomicBool,
     pub audio: AtomicBool,
     pub apps: Mutex<Vec<String>>,
+    pub browsers: Mutex<Vec<String>>,
 }
 
 #[tauri::command]
@@ -87,6 +112,16 @@ pub fn set_apps<R: Runtime>(app: &AppHandle<R>, apps: Vec<String>) {
     }
 }
 
+/// Update the live browser allow list used by the camera/mic consent check.
+/// Mirrors `set_apps`: call on setup and whenever the user edits the list.
+pub fn set_browsers<R: Runtime>(app: &AppHandle<R>, browsers: Vec<String>) {
+    if let Some(store) = app.try_state::<MeetingStateStore>() {
+        if let Ok(mut g) = store.browsers.lock() {
+            *g = browsers;
+        }
+    }
+}
+
 /// Returns a plugin that, on setup, registers the state store + query command and
 /// spawns the background watcher using the platform signal source.
 pub fn plugin<R: Runtime>(config: MeetingConfig) -> TauriPlugin<R> {
@@ -99,6 +134,7 @@ pub fn plugin<R: Runtime>(config: MeetingConfig) -> TauriPlugin<R> {
                 mic: AtomicBool::new(false),
                 audio: AtomicBool::new(false),
                 apps: Mutex::new(config.audio_app_names.clone()),
+                browsers: Mutex::new(config.browser_app_names.clone()),
             });
 
             #[cfg(windows)]
@@ -116,7 +152,7 @@ pub fn plugin<R: Runtime>(config: MeetingConfig) -> TauriPlugin<R> {
 struct NoopSource;
 #[cfg(not(windows))]
 impl SignalSource for NoopSource {
-    fn camera_in_use(&self) -> bool { false }
-    fn mic_in_use(&self) -> bool { false }
+    fn camera_in_use(&self, _browsers: &[String]) -> bool { false }
+    fn mic_in_use(&self, _browsers: &[String]) -> bool { false }
     fn meeting_app_audio_active(&self, _allow: &[String]) -> bool { false }
 }
