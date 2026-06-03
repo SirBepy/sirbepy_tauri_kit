@@ -6,10 +6,10 @@ name: Tauri Windows Release (reusable)
 #   jobs:
 #     release:
 #       uses: SirBepy/sirbepy_tauri_kit/.github/workflows/tauri-windows-release.yml@main
-#       with: { asset-name: My-App }
 #       secrets: inherit
 #
-# It resolves the version from the caller's package.json (source of truth),
+# It resolves productName from src-tauri/tauri.conf.json (used for the release
+# title and asset filenames), the version from package.json (source of truth),
 # tags `<tag-prefix><version>` if that tag does not exist yet, builds the Windows
 # bundle (NSIS + MSI), and publishes the installers - plus, when `sign` is true,
 # an updater `latest.json` + `.sig` - to a GitHub Release on the CALLER's repo.
@@ -19,10 +19,6 @@ name: Tauri Windows Release (reusable)
 on:
   workflow_call:
     inputs:
-      asset-name:
-        description: Base name for release assets, e.g. "Server-Supervisor".
-        required: true
-        type: string
       tag-prefix:
         description: Git tag prefix; the tag is <prefix><version>.
         required: false
@@ -49,6 +45,8 @@ jobs:
       should_release: ${{ steps.check.outputs.should_release }}
       tag: ${{ steps.check.outputs.tag }}
       version: ${{ steps.check.outputs.version }}
+      product_name: ${{ steps.check.outputs.product_name }}
+      product_slug: ${{ steps.check.outputs.product_slug }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,9 +56,13 @@ jobs:
         shell: bash
         run: |
           VERSION=$(jq -r .version package.json)
+          PRODUCT_NAME=$(jq -r .productName src-tauri/tauri.conf.json)
+          PRODUCT_SLUG=$(echo "$PRODUCT_NAME" | tr ' ' '-')
           TAG="${{ inputs.tag-prefix }}$VERSION"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "product_name=$PRODUCT_NAME" >> "$GITHUB_OUTPUT"
+          echo "product_slug=$PRODUCT_SLUG" >> "$GITHUB_OUTPUT"
           if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
             echo "Tag $TAG already exists. Skipping release."
             echo "should_release=false" >> "$GITHUB_OUTPUT"
@@ -146,7 +148,7 @@ jobs:
         run: |
           VERSION="${{ needs.check.outputs.version }}"
           TAG="${{ needs.check.outputs.tag }}"
-          NAME="${{ inputs.asset-name }}"
+          NAME="${{ needs.check.outputs.product_slug }}"
           SIGN="${{ inputs.sign }}"
           mkdir -p "$GITHUB_WORKSPACE/release-staging"
 
@@ -166,7 +168,7 @@ jobs:
           if [ "$SIGN" = "true" ]; then
             cp "${EXE}.sig" "$GITHUB_WORKSPACE/release-staging/${ASSET}.sig"
             SIG=$(cat "${EXE}.sig")
-            URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${ASSET}"
+            URL="$GITHUB_SERVER_URL/${{ github.repository }}/releases/download/${TAG}/${ASSET}"
             jq -n --arg sig "$SIG" --arg url "$URL" \
               '{signature:$sig, url:$url}' \
               > "$GITHUB_WORKSPACE/release-staging/windows-x86_64.json"
@@ -225,6 +227,6 @@ jobs:
             artifacts/*.msi
             artifacts/latest.json
           tag_name: ${{ needs.check.outputs.tag }}
-          name: ${{ needs.check.outputs.tag }}
+          name: ${{ needs.check.outputs.product_name }} v${{ needs.check.outputs.version }}
           draft: false
           make_latest: "true"
