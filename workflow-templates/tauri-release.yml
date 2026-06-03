@@ -1,0 +1,282 @@
+name: Tauri Release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      tag: ${{ steps.check.outputs.tag }}
+      version: ${{ steps.check.outputs.version }}
+      product_name: ${{ steps.check.outputs.product_name }}
+      product_slug: ${{ steps.check.outputs.product_slug }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version and tag
+        id: check
+        shell: bash
+        run: |
+          VERSION=$(jq -r .version package.json)
+          PRODUCT_NAME=$(jq -r .productName src-tauri/tauri.conf.json)
+          PRODUCT_SLUG=$(echo "$PRODUCT_NAME" | tr ' ' '-')
+          TAG="tauri-v$VERSION"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "product_name=$PRODUCT_NAME" >> "$GITHUB_OUTPUT"
+          echo "product_slug=$PRODUCT_SLUG" >> "$GITHUB_OUTPUT"
+          if git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists. Skipping release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag $TAG not found. Will release."
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  tag:
+    needs: check
+    if: needs.check.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create and push tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ needs.check.outputs.tag }}"
+          git push origin "${{ needs.check.outputs.tag }}"
+
+  build:
+    needs: [check, tag]
+    if: needs.check.outputs.should_release == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            updater_key: windows-x86_64
+            os_label: windows
+            arch_label: x64
+          - os: macos-14
+            target: aarch64-apple-darwin
+            updater_key: darwin-aarch64
+            os_label: macos
+            arch_label: arm64
+          - os: macos-14
+            target: x86_64-apple-darwin
+            updater_key: darwin-x86_64
+            os_label: macos
+            arch_label: x64
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            updater_key: linux-x86_64
+            os_label: linux
+            arch_label: x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            build-essential \
+            libssl-dev \
+            libgtk-3-dev \
+            libasound2-dev
+
+      - name: Sync version into tauri.conf.json, Cargo.toml, and package.json
+        shell: bash
+        run: |
+          VERSION="${{ needs.check.outputs.version }}"
+          # tauri.conf.json: source of truth for Tauri bundler.
+          jq --arg v "$VERSION" '.version = $v' src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp
+          mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
+          # Cargo.toml: only `^version = "..."` lines hit (deps use `  version = ...`
+          # with leading whitespace inside inline tables). `-i.bak` is the form
+          # both GNU sed (Linux) and BSD sed (macOS) accept.
+          sed -i.bak -E "s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/Cargo.toml
+          rm src-tauri/Cargo.toml.bak
+          # package.json: already the source of truth, write back to be explicit.
+          jq --arg v "$VERSION" '.version = $v' package.json > package.json.tmp
+          mv package.json.tmp package.json
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: ${{ matrix.target }}
+          cache-on-failure: true
+
+      - name: Install Tauri CLI
+        uses: taiki-e/install-action@v2
+        with:
+          tool: tauri-cli
+
+      - name: Build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        working-directory: src-tauri
+        # Invoke cargo-tauri directly, not `cargo tauri`. On macos-14 runners
+        # `/opt/homebrew/bin/cargo` is a rustup-init shim that shadows the real
+        # `~/.cargo/bin/cargo` and breaks subcommand dispatch with
+        # "error: unexpected argument 'tauri' found / Usage: rustup-init".
+        # Calling cargo-tauri (the actual binary installed by tauri-cli) skips
+        # that lookup entirely.
+        run: cargo-tauri build --target ${{ matrix.target }}
+
+      - name: Stage Windows artifacts
+        if: runner.os == 'Windows'
+        shell: bash
+        working-directory: src-tauri/target/${{ matrix.target }}/release/bundle/nsis
+        run: |
+          TAG="${{ needs.check.outputs.tag }}"
+          VERSION="${{ needs.check.outputs.version }}"
+          SLUG="${{ needs.check.outputs.product_slug }}"
+          mkdir -p "$GITHUB_WORKSPACE/release-staging"
+          EXE_FILE=$(ls *_x64-setup.exe | head -n 1)
+          ASSET="${SLUG}_${VERSION}_${{ matrix.os_label }}_${{ matrix.arch_label }}.exe"
+          cp "$EXE_FILE" "$GITHUB_WORKSPACE/release-staging/$ASSET"
+          cp "${EXE_FILE}.sig" "$GITHUB_WORKSPACE/release-staging/${ASSET}.sig"
+          SIG=$(cat "${EXE_FILE}.sig")
+          URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${TAG}/${ASSET}"
+          jq -n --arg sig "$SIG" --arg url "$URL" \
+            '{signature:$sig, url:$url}' \
+            > "$GITHUB_WORKSPACE/release-staging/${{ matrix.updater_key }}.json"
+
+      - name: Stage macOS artifacts
+        if: runner.os == 'macOS'
+        shell: bash
+        working-directory: src-tauri/target/${{ matrix.target }}/release/bundle
+        run: |
+          TAG="${{ needs.check.outputs.tag }}"
+          VERSION="${{ needs.check.outputs.version }}"
+          SLUG="${{ needs.check.outputs.product_slug }}"
+          mkdir -p "$GITHUB_WORKSPACE/release-staging"
+          # Updater payload: .app.tar.gz + .sig (createUpdaterArtifacts=true).
+          APP_TGZ=$(ls macos/*.app.tar.gz | head -n 1)
+          ASSET_TGZ="${SLUG}_${VERSION}_${{ matrix.os_label }}_${{ matrix.arch_label }}.app.tar.gz"
+          cp "$APP_TGZ" "$GITHUB_WORKSPACE/release-staging/$ASSET_TGZ"
+          cp "${APP_TGZ}.sig" "$GITHUB_WORKSPACE/release-staging/${ASSET_TGZ}.sig"
+          SIG=$(cat "${APP_TGZ}.sig")
+          URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${TAG}/${ASSET_TGZ}"
+          jq -n --arg sig "$SIG" --arg url "$URL" \
+            '{signature:$sig, url:$url}' \
+            > "$GITHUB_WORKSPACE/release-staging/${{ matrix.updater_key }}.json"
+          # DMG for first-time installs.
+          DMG_FILE=$(ls dmg/*.dmg | head -n 1)
+          ASSET_DMG="${SLUG}_${VERSION}_${{ matrix.os_label }}_${{ matrix.arch_label }}.dmg"
+          cp "$DMG_FILE" "$GITHUB_WORKSPACE/release-staging/$ASSET_DMG"
+
+      - name: Stage Linux artifacts
+        if: runner.os == 'Linux'
+        shell: bash
+        working-directory: src-tauri/target/${{ matrix.target }}/release/bundle
+        run: |
+          TAG="${{ needs.check.outputs.tag }}"
+          VERSION="${{ needs.check.outputs.version }}"
+          SLUG="${{ needs.check.outputs.product_slug }}"
+          mkdir -p "$GITHUB_WORKSPACE/release-staging"
+          # AppImage doubles as updater payload + portable run; signed in place.
+          APPIMG=$(ls appimage/*.AppImage | head -n 1)
+          ASSET_APP="${SLUG}_${VERSION}_${{ matrix.os_label }}_${{ matrix.arch_label }}.AppImage"
+          cp "$APPIMG" "$GITHUB_WORKSPACE/release-staging/$ASSET_APP"
+          cp "${APPIMG}.sig" "$GITHUB_WORKSPACE/release-staging/${ASSET_APP}.sig"
+          SIG=$(cat "${APPIMG}.sig")
+          URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${TAG}/${ASSET_APP}"
+          jq -n --arg sig "$SIG" --arg url "$URL" \
+            '{signature:$sig, url:$url}' \
+            > "$GITHUB_WORKSPACE/release-staging/${{ matrix.updater_key }}.json"
+          # DEB for apt-managed installs.
+          DEB=$(ls deb/*.deb | head -n 1)
+          ASSET_DEB="${SLUG}_${VERSION}_${{ matrix.os_label }}_${{ matrix.arch_label }}.deb"
+          cp "$DEB" "$GITHUB_WORKSPACE/release-staging/$ASSET_DEB"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.updater_key }}
+          path: release-staging/
+
+  publish:
+    needs: [check, tag, build]
+    if: needs.check.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          pattern: release-*
+          merge-multiple: true
+
+      - name: Generate latest.json
+        shell: bash
+        working-directory: artifacts
+        run: |
+          VERSION="${{ needs.check.outputs.version }}"
+          DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          PLATFORMS="{}"
+          for f in *.json; do
+            KEY="${f%.json}"
+            PLATFORMS=$(jq --arg k "$KEY" --slurpfile p "$f" \
+              '. + {($k): $p[0]}' <<< "$PLATFORMS")
+          done
+          jq -n \
+            --arg version "$VERSION" \
+            --arg notes "Release $VERSION" \
+            --arg pub_date "$DATE" \
+            --argjson platforms "$PLATFORMS" \
+            '{version:$version, notes:$notes, pub_date:$pub_date, platforms:$platforms}' \
+            > latest.json
+          cat latest.json
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/*.exe
+            artifacts/*.exe.sig
+            artifacts/*.app.tar.gz
+            artifacts/*.app.tar.gz.sig
+            artifacts/*.dmg
+            artifacts/*.deb
+            artifacts/*.AppImage
+            artifacts/*.AppImage.sig
+            artifacts/latest.json
+          tag_name: ${{ needs.check.outputs.tag }}
+          name: ${{ needs.check.outputs.product_name }} v${{ needs.check.outputs.version }}
+          draft: false
+          make_latest: "true"
