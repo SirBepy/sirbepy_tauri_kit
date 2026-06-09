@@ -21,6 +21,18 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+/* ==== SPACING SCALE (settings row/field/button rhythm) ====
+ * Shared knobs for the slim claude_usage-style spacing. Tighten the whole
+ * settings UI from here rather than per-component, so it stays scalable. */
+:root {
+  --kit-row-pad-y: 6px;        /* vertical padding inside each settings row */
+  --kit-row-min-h: 36px;       /* min row height (control alignment baseline) */
+  --kit-section-margin: 12px 10px;  /* gap between cards + card outer inset */
+  --kit-section-pad: 13px;     /* inner padding of a settings card */
+  --kit-field-pad: 0.3rem 0.6rem;   /* input/select padding */
+  --kit-btn-pad: 6px 14px;     /* button padding */
+}
+
 /* ==== --kit-* ALIASES → styleguide --color-* (TEMPORARY) ==== */
 :root {
   --kit-bg: var(--color-background);

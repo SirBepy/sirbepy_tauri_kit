@@ -85,11 +85,11 @@
 
 /* ==== SECTIONS (claude_usage flat-card look) ==== */
 .kit-section {
-  margin: 16px 12px;
+  margin: var(--kit-section-margin, 16px 12px);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card, 10px);
-  padding: 16px;
+  padding: var(--kit-section-pad, 16px);
   box-shadow: var(--shadow-card, 0 4px 16px rgba(0, 0, 0, 0.35));
 }
 .kit-section-title {
@@ -110,8 +110,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 9px 0;
-  min-height: 44px;
+  padding: var(--kit-row-pad-y, 9px) 0;
+  min-height: var(--kit-row-min-h, 44px);
   border-bottom: 1px solid var(--color-border);
 }
 .kit-row:first-of-type {
