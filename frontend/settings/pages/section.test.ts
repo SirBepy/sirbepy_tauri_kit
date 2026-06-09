@@ -50,6 +50,47 @@ describe("sectionPage", () => {
     expect(changes).toEqual([["work_minutes", 42]]);
   });
 
+  it("renders custom up/down stepper buttons for number fields", () => {
+    const section: Section = {
+      title: "Times",
+      fields: [{ key: "work_minutes", kind: "integer", label: "Pomodoro" }],
+    };
+    const page = sectionPage(section, { work_minutes: 25 }, () => {}, () => {});
+    render(page.render(), root);
+
+    const steppers = root.querySelectorAll<HTMLButtonElement>("button.kit-number-step");
+    expect(steppers.length).toBe(2);
+    steppers.forEach((b) => expect(b.type).toBe("button"));
+    expect(steppers[0].getAttribute("aria-label")).toBe("Increase Pomodoro");
+    expect(steppers[1].getAttribute("aria-label")).toBe("Decrease Pomodoro");
+  });
+
+  it("stepper buttons fire onChange via the same save path, clamped to min/max", () => {
+    const section: Section = {
+      title: "Times",
+      fields: [{ key: "work_minutes", kind: "integer", label: "Pomo", min: 1, max: 26 }],
+    };
+    const changes: [string, unknown][] = [];
+    const page = sectionPage(
+      section,
+      { work_minutes: 25 },
+      (k, v) => changes.push([k, v]),
+      () => {},
+    );
+    render(page.render(), root);
+
+    const steppers = root.querySelectorAll<HTMLButtonElement>("button.kit-number-step");
+    steppers[0].click(); // up: 25 -> 26
+    steppers[0].click(); // up again, clamped at max 26
+    steppers[1].click(); // down: 25 -> 24
+
+    expect(changes).toEqual([
+      ["work_minutes", 26],
+      ["work_minutes", 26],
+      ["work_minutes", 24],
+    ]);
+  });
+
   it("page id and title match section", () => {
     const section: Section = { title: "Times", fields: [] };
     const page = sectionPage(section, {}, () => {}, () => {});

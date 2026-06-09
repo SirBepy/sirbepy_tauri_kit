@@ -28,22 +28,52 @@ export function fieldRow(
     case "number":
     case "integer": {
       const step = field.kind === "integer" ? 1 : "step" in field ? field.step : undefined;
+      const min = "min" in field && field.min !== undefined ? field.min : undefined;
+      const max = "max" in field && field.max !== undefined ? field.max : undefined;
+      const stepBy = (dir: 1 | -1) => {
+        const current = typeof value === "number" && !Number.isNaN(value) ? value : 0;
+        const delta = (step ?? 1) * dir;
+        let next = current + delta;
+        if (min !== undefined) next = Math.max(min, next);
+        if (max !== undefined) next = Math.min(max, next);
+        onChange(field.kind === "integer" ? Math.round(next) : next);
+      };
       return html`
         <label class="kit-row">
           ${labelCell(field)}
-          <input
-            type="number"
-            data-key=${field.key}
-            class="kit-input"
-            .value=${String(value ?? "")}
-            min=${"min" in field && field.min !== undefined ? field.min : ""}
-            max=${"max" in field && field.max !== undefined ? field.max : ""}
-            step=${step !== undefined ? step : ""}
-            @input=${(e: Event) => {
-              const v = (e.target as HTMLInputElement).value;
-              onChange(field.kind === "integer" ? parseInt(v, 10) : parseFloat(v));
-            }}
-          />
+          <span class="kit-number">
+            <input
+              type="number"
+              data-key=${field.key}
+              class="kit-input"
+              .value=${String(value ?? "")}
+              min=${min !== undefined ? min : ""}
+              max=${max !== undefined ? max : ""}
+              step=${step !== undefined ? step : ""}
+              @input=${(e: Event) => {
+                const v = (e.target as HTMLInputElement).value;
+                onChange(field.kind === "integer" ? parseInt(v, 10) : parseFloat(v));
+              }}
+            />
+            <span class="kit-number-steppers">
+              <button
+                type="button"
+                class="kit-number-step"
+                aria-label="Increase ${field.label}"
+                @click=${() => stepBy(1)}
+              >
+                <i class="ph ph-caret-up"></i>
+              </button>
+              <button
+                type="button"
+                class="kit-number-step"
+                aria-label="Decrease ${field.label}"
+                @click=${() => stepBy(-1)}
+              >
+                <i class="ph ph-caret-down"></i>
+              </button>
+            </span>
+          </span>
         </label>
       `;
     }
