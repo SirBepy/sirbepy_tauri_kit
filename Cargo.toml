@@ -5,6 +5,7 @@ members = [
   "tauri/updater",
   "tauri/window",
   "tauri/meeting",
+  "tauri/audio",
 ]
 
 [workspace.package]
