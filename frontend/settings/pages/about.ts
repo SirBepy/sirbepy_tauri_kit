@@ -1,6 +1,10 @@
 import { html } from "lit-html";
-import { openUrl } from "@tauri-apps/plugin-opener";
 import type { PageDef } from "../stack";
+
+/** Browser-safe fallback opener used when the host app does not inject one. */
+function defaultOpenLink(url: string): void {
+  window.open(url, "_blank", "noopener");
+}
 
 export type AutoUpdateMode = "never" | "onStartup" | "immediate";
 
@@ -27,6 +31,13 @@ export interface AboutPageDeps {
   onCheckNow: () => Promise<void>;
   onCopyLogs: () => Promise<void>;
   onBack: () => void;
+  /**
+   * Opens an external link. The consuming Tauri app should route this through its
+   * own opener (e.g. an `open_external` IPC). Defaults to `window.open`. The kit
+   * deliberately does NOT import `@tauri-apps/plugin-opener` so it carries no
+   * Tauri dependency and bundles cleanly in any consumer.
+   */
+  onOpenLink?: (url: string) => void;
   /** Update state for display + action button. When omitted, shows "Up to date". */
   update?: AboutUpdateDeps;
   /** Called when internal state changes (e.g. version tap counter), so host can re-render. */
@@ -57,6 +68,7 @@ const TAPS_REQUIRED = 5;
 const DEBUG_STORAGE_KEY = "kit_debug_unlocked";
 
 export function aboutPage(deps: AboutPageDeps): PageDef {
+  const openLink = deps.onOpenLink ?? defaultOpenLink;
   const state: AboutState = {
     tapCount: 0,
     lastTapAt: 0,
@@ -185,7 +197,7 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
                   class="kit-dev-link"
                   type="button"
                   title=${key}
-                  @click=${() => void openUrl(url!)}
+                  @click=${() => openLink(url!)}
                 >
                   <i class=${iconClassFor(key)}></i>
                 </button>

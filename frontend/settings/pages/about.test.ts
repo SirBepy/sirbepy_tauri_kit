@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render } from "lit-html";
 
-const openUrlMock = vi.fn();
-vi.mock("@tauri-apps/plugin-opener", () => ({
-  openUrl: (url: string) => openUrlMock(url),
-}));
-
 import { aboutPage } from "./about";
 
 describe("aboutPage", () => {
@@ -41,15 +36,15 @@ describe("aboutPage", () => {
     expect(root.querySelector(".kit-dev-name")?.textContent).toContain("Tester");
   });
 
-  it("renders developer link icons that open via openUrl", () => {
-    openUrlMock.mockClear();
-    const page = aboutPage(defaultDeps());
+  it("renders developer link icons that open via the injected onOpenLink", () => {
+    const onOpenLink = vi.fn();
+    const page = aboutPage(defaultDeps({ onOpenLink }));
     render(page.render(), root);
     const links = root.querySelectorAll<HTMLButtonElement>(".kit-dev-link");
     expect(links.length).toBe(1);
     expect(links[0].getAttribute("title")).toBe("github");
     links[0].click();
-    expect(openUrlMock).toHaveBeenCalledWith("https://github.com/x");
+    expect(onOpenLink).toHaveBeenCalledWith("https://github.com/x");
   });
 
   it("auto-update select reflects current value", () => {
