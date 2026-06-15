@@ -22,6 +22,11 @@
   cursor: pointer;
   user-select: none;
 }
+.kit-about-meta {
+  font-size: 11px;
+  color: var(--kit-text-dim);
+  margin-top: 2px;
+}
 .kit-about-status {
   font-size: 11px;
   color: var(--kit-text-dim);

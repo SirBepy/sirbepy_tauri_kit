@@ -4,9 +4,20 @@ import type { PageDef } from "../stack";
 
 export type AutoUpdateMode = "never" | "onStartup" | "immediate";
 
+export interface AboutUpdateDeps {
+  statusText?: string;
+  statusColor?: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}
+
 export interface AboutPageDeps {
   appName: string;
   version: string;
+  /** Build timestamp embedded at compile time, e.g. "2026-06-15". */
+  buildDate?: string;
+  /** Date the current version was first launched on this machine, e.g. "2026-06-15". */
+  installedAt?: string;
   developer: {
     name: string;
     links: Record<string, string | null | undefined>;
@@ -16,6 +27,8 @@ export interface AboutPageDeps {
   onCheckNow: () => Promise<void>;
   onCopyLogs: () => Promise<void>;
   onBack: () => void;
+  /** Update state for display + action button. When omitted, shows "Up to date". */
+  update?: AboutUpdateDeps;
   /** Called when internal state changes (e.g. version tap counter), so host can re-render. */
   onRerender?: () => void;
 }
@@ -86,7 +99,12 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
       <div class="kit-about-hero">
         <div class="kit-about-app-name">${deps.appName}</div>
         <div class="kit-about-version" @click=${onVersionTap}>v${deps.version}</div>
-        <div class="kit-about-status">Up to date</div>
+        ${deps.buildDate ? html`<div class="kit-about-meta">Built ${deps.buildDate}</div>` : null}
+        ${deps.installedAt ? html`<div class="kit-about-meta">Installed ${deps.installedAt}</div>` : null}
+        <div
+          class="kit-about-status"
+          style=${deps.update?.statusColor ? `color: ${deps.update.statusColor}` : ""}
+        >${deps.update?.statusText ?? "Up to date"}</div>
       </div>
 
       <div class="kit-section">
@@ -115,6 +133,19 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
             ? html`<i class="ph ph-circle-notch kit-spin"></i> Checking…`
             : html`↻ Check for updates now`}</button>
         </div>
+
+        ${deps.update?.actionLabel && deps.update.onAction
+          ? html`
+            <div class="kit-row">
+              <button
+                class="kit-btn-primary"
+                style="width: 100%"
+                data-action="update-action"
+                @click=${deps.update.onAction}
+              >${deps.update.actionLabel}</button>
+            </div>
+          `
+          : null}
 
         ${state.debugUnlocked
           ? html`
