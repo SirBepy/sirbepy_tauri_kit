@@ -134,7 +134,7 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
             <option value="immediate">Immediate</option>
           </select>
         </label>
-        <div class="kit-row" style="border-top: 1px solid var(--kit-border)">
+        <div class="kit-row">
           <button
             class="kit-btn-secondary"
             style="width: 100%"

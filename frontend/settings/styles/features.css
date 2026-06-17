@@ -9,7 +9,6 @@
 .kit-about-hero {
   padding: 28px 16px;
   text-align: center;
-  border-bottom: 1px solid var(--kit-border);
 }
 .kit-about-app-name {
   font-size: 18px;
