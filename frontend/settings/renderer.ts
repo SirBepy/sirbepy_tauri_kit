@@ -79,8 +79,13 @@ export async function renderSettingsPage(
   const paletteOf = (s: SettingsValue): string | undefined =>
     hasPalettes ? ((s["__kit_palette"] as string) ?? defaultPalette) : undefined;
 
-  // Apply default theme before first paint to avoid a light-flash on dark setups.
-  applyTheme(defaultMode, defaultPalette);
+  // Apply default theme only if nothing is already applied (first app paint). On
+  // subsequent navigations back to settings the HTML element already has the
+  // user's saved theme; overwriting it with the default causes a visible flash
+  // back to "system" before hydration restores the saved value.
+  if (!document.documentElement.hasAttribute("data-theme")) {
+    applyTheme(defaultMode, defaultPalette);
+  }
 
   // Synchronous DOM scaffold + first paint with empty values.
   // Settings hydrate asynchronously below; sections list is schema-driven and renders immediately.
@@ -203,26 +208,28 @@ export async function renderSettingsPage(
   const navAboutSync = () => { void navAbout(); };
 
   const navSystem = () => {
-    stack.push(
-      systemPage({
-        systemInline: opts.systemInline ?? [],
-        dangerActions: opts.dangerActions ?? [],
-        current,
-        palettes,
-        get theme() {
-          return modeOf(current);
-        },
-        get palette() {
-          return paletteOf(current);
-        },
-        onChange: setField,
-        onThemeChange,
-        onPaletteChange,
-        onReset,
-        onDanger,
-        onBack: () => stack.pop(),
-      }),
-    );
+    void hydrated.then(() => {
+      stack.push(
+        systemPage({
+          systemInline: opts.systemInline ?? [],
+          dangerActions: opts.dangerActions ?? [],
+          current,
+          palettes,
+          get theme() {
+            return modeOf(current);
+          },
+          get palette() {
+            return paletteOf(current);
+          },
+          onChange: setField,
+          onThemeChange,
+          onPaletteChange,
+          onReset,
+          onDanger,
+          onBack: () => stack.pop(),
+        }),
+      );
+    });
   };
 
   // First paint: schema-driven shell renders immediately with empty `current`.
