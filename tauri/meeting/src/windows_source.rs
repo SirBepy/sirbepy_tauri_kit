@@ -1,47 +1,62 @@
 //! Windows implementation of SignalSource.
-//! - camera/mic: read the CapabilityAccessManager ConsentStore in HKCU. A subkey
-//!   whose `LastUsedTimeStop` == 0 means that app holds the device right now. We
-//!   only count subkeys belonging to a browser process: native meeting apps are
-//!   covered by the audio-session check, and an unscoped scan false-fires on any
-//!   app that parks the device (e.g. Discord holds the mic the whole time it runs).
-//!   Browsers, by contrast, only acquire the device for the duration of a call, so
-//!   browser-scoping is what catches Google Meet / Zoom-web.
-//! - audio: enumerate active audio render sessions, map each PID to a process name,
-//!   and match against the meeting-app allow list.
+//! - camera/mic (browser-scoped): read the CapabilityAccessManager ConsentStore in
+//!   HKCU. A subkey whose `LastUsedTimeStop` == 0 means that app holds the device
+//!   right now. Scoped to browser processes because browsers only acquire the
+//!   device for the duration of a call, so this catches Google Meet / Zoom-web
+//!   without false-firing on apps that park the device.
+//! - native apps (`probe_apps`): the meeting signal for desktop apps is *mic-hold*
+//!   (the same ConsentStore `LastUsedTimeStop == 0`, but matched against the
+//!   meeting-app list). Mic-hold is the canonical "mic in use" signal: it survives
+//!   a long mute (app-level mute never releases the device) and ignores playback
+//!   (notification pings, voice-message playback), which is what fixed the
+//!   playback-based false positives. We also probe active audio *render* sessions
+//!   purely for diagnostics, never for the decision.
 
 #![cfg(windows)]
 
-use crate::signal::{process_name_from_consent_key, process_name_matches, SignalSource};
+use crate::signal::{process_name_from_consent_key, process_name_matches, AppProbe, SignalSource};
 use std::collections::HashMap;
 
 pub struct WindowsSignalSource;
 
 impl SignalSource for WindowsSignalSource {
     fn camera_in_use(&self, browsers: &[String]) -> bool {
-        consent_store_in_use("webcam", browsers)
+        !consent_store_holders("webcam", browsers).is_empty()
     }
     fn mic_in_use(&self, browsers: &[String]) -> bool {
-        consent_store_in_use("microphone", browsers)
+        !consent_store_holders("microphone", browsers).is_empty()
     }
-    fn meeting_app_audio_active(&self, allow: &[String]) -> bool {
-        if allow.is_empty() {
-            return false;
+    fn probe_apps(&self, apps: &[String]) -> AppProbe {
+        AppProbe {
+            mic_held: consent_store_holders("microphone", apps),
+            audio_playing: audio_playing_apps(apps),
         }
-        match active_audio_pids() {
-            Ok(pids) if !pids.is_empty() => {
-                let names = pid_name_map();
-                pids.iter().any(|pid| {
-                    names
-                        .get(pid)
-                        .map(|n| process_name_matches(n, allow))
-                        .unwrap_or(false)
-                })
-            }
-            Ok(_) => false,
-            Err(e) => {
-                log::warn!("meeting: audio session scan failed: {e}");
-                false
-            }
+    }
+}
+
+/// App process names (from `apps`) that currently have an active audio render
+/// (playback) session. Diagnostic only - playback is NOT a meeting signal.
+fn audio_playing_apps(apps: &[String]) -> Vec<String> {
+    if apps.is_empty() {
+        return Vec::new();
+    }
+    match active_audio_pids() {
+        Ok(pids) if !pids.is_empty() => {
+            let names = pid_name_map();
+            let mut hits: Vec<String> = pids
+                .iter()
+                .filter_map(|pid| names.get(pid))
+                .filter(|n| process_name_matches(n, apps))
+                .cloned()
+                .collect();
+            hits.sort();
+            hits.dedup();
+            hits
+        }
+        Ok(_) => Vec::new(),
+        Err(e) => {
+            log::warn!("meeting: audio session scan failed: {e}");
+            Vec::new()
         }
     }
 }
@@ -52,42 +67,42 @@ fn to_wide(s: &str) -> Vec<u16> {
     s.encode_utf16().chain(std::iter::once(0)).collect()
 }
 
-/// Returns true if a browser app under
+/// Process names (from `allow`) that currently hold `device` under
 /// `...\CapabilityAccessManager\ConsentStore\<device>` (or its `NonPackaged`
-/// subtree) currently holds the device (LastUsedTimeStop == 0). `browsers` is the
-/// process-name allow list; a non-browser app holding the device is ignored.
-fn consent_store_in_use(device: &str, browsers: &[String]) -> bool {
-    if browsers.is_empty() {
-        return false;
+/// subtree), i.e. their `LastUsedTimeStop` == 0. Apps not in `allow` are ignored.
+fn consent_store_holders(device: &str, allow: &[String]) -> Vec<String> {
+    if allow.is_empty() {
+        return Vec::new();
     }
     let base = format!(
         "Software\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\{device}"
     );
-    if any_child_active(&base, browsers) {
-        return true;
-    }
-    any_child_active(&format!("{base}\\NonPackaged"), browsers)
+    let mut hits = active_children(&base, allow);
+    hits.extend(active_children(&format!("{base}\\NonPackaged"), allow));
+    hits.sort();
+    hits.dedup();
+    hits
 }
 
-/// Open `parent`, enumerate its immediate subkeys, and return true if any subkey
-/// whose process name matches `browsers` has a `LastUsedTimeStop` value equal to 0.
-fn any_child_active(parent: &str, browsers: &[String]) -> bool {
+/// Open `parent`, enumerate its immediate subkeys, and return the process names
+/// (matched against `allow`) whose `LastUsedTimeStop` value equals 0.
+fn active_children(parent: &str, allow: &[String]) -> Vec<String> {
     use windows::core::PCWSTR;
     use windows::Win32::Foundation::ERROR_SUCCESS;
     use windows::Win32::System::Registry::{
         RegCloseKey, RegEnumKeyExW, RegOpenKeyExW, HKEY, HKEY_CURRENT_USER, KEY_READ,
     };
 
+    let mut hits = Vec::new();
     let wparent = to_wide(parent);
     let mut hkey = HKEY::default();
     let opened = unsafe {
         RegOpenKeyExW(HKEY_CURRENT_USER, PCWSTR(wparent.as_ptr()), 0, KEY_READ, &mut hkey)
     };
     if opened != ERROR_SUCCESS {
-        return false;
+        return hits;
     }
 
-    let mut found = false;
     let mut index = 0u32;
     loop {
         let mut name_buf = [0u16; 256];
@@ -109,20 +124,20 @@ fn any_child_active(parent: &str, browsers: &[String]) -> bool {
         }
         let child = String::from_utf16_lossy(&name_buf[..name_len as usize]);
         index += 1;
-        // Only browser processes count; a parked device on any other app is noise.
-        if !process_name_matches(process_name_from_consent_key(&child), browsers) {
+        let name = process_name_from_consent_key(&child);
+        // Only listed processes count; a parked device on any other app is noise.
+        if !process_name_matches(name, allow) {
             continue;
         }
         let full = format!("{parent}\\{child}");
         if last_used_stop_is_zero(&full) {
-            found = true;
-            break;
+            hits.push(name.to_string());
         }
     }
     unsafe {
         let _ = RegCloseKey(hkey);
     }
-    found
+    hits
 }
 
 /// Read REG_QWORD `LastUsedTimeStop` under `key_path`; return true iff it equals 0.

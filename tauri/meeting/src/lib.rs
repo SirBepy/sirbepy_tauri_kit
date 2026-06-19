@@ -37,20 +37,24 @@ impl Default for MeetingConfig {
     }
 }
 
-/// Built-in meeting-app process names.
+/// Built-in meeting-app process names. These are detected by *mic-hold*: they
+/// acquire the mic device only during a call, so holding it == in a call.
+/// Discord is intentionally absent - it parks the mic the whole time it runs, so
+/// mic-hold can't tell a call apart from it merely being open; it is probed for
+/// diagnostics (see `observe_only_apps`) and otherwise left to the manual toggle.
 pub fn default_meeting_apps() -> Vec<String> {
-    [
-        "Teams.exe",
-        "ms-teams.exe",
-        "Zoom.exe",
-        "CptHost.exe",
-        "Discord.exe",
-        "slack.exe",
-        "Webex.exe",
-    ]
-    .iter()
-    .map(|s| s.to_string())
-    .collect()
+    ["Teams.exe", "ms-teams.exe", "Zoom.exe", "CptHost.exe", "slack.exe", "Webex.exe"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect()
+}
+
+/// Apps probed for diagnostics only - logged each poll (mic-held vs playing audio)
+/// but never used for the in-meeting decision. Lets us learn an always-on-mic
+/// app's real behavior (does Discord hold the mic when idle, or only in a call?)
+/// without it causing false positives.
+pub fn observe_only_apps() -> Vec<String> {
+    ["Discord.exe"].iter().map(|s| s.to_string()).collect()
 }
 
 /// Built-in browser process names for the camera/mic consent check. Browsers hold
@@ -85,7 +89,7 @@ pub(crate) struct MeetingStateStore {
     pub active: AtomicBool,
     pub camera: AtomicBool,
     pub mic: AtomicBool,
-    pub audio: AtomicBool,
+    pub app_mic: AtomicBool,
     pub apps: Mutex<Vec<String>>,
     pub browsers: Mutex<Vec<String>>,
 }
@@ -97,7 +101,7 @@ fn kit_meeting_state(store: State<'_, MeetingStateStore>) -> MeetingState {
         sources: Sources {
             camera: store.camera.load(Ordering::Relaxed),
             mic: store.mic.load(Ordering::Relaxed),
-            audio: store.audio.load(Ordering::Relaxed),
+            app_mic: store.app_mic.load(Ordering::Relaxed),
         },
     }
 }
@@ -132,7 +136,7 @@ pub fn plugin<R: Runtime>(config: MeetingConfig) -> TauriPlugin<R> {
                 active: AtomicBool::new(false),
                 camera: AtomicBool::new(false),
                 mic: AtomicBool::new(false),
-                audio: AtomicBool::new(false),
+                app_mic: AtomicBool::new(false),
                 apps: Mutex::new(config.audio_app_names.clone()),
                 browsers: Mutex::new(config.browser_app_names.clone()),
             });
@@ -154,5 +158,5 @@ struct NoopSource;
 impl SignalSource for NoopSource {
     fn camera_in_use(&self, _browsers: &[String]) -> bool { false }
     fn mic_in_use(&self, _browsers: &[String]) -> bool { false }
-    fn meeting_app_audio_active(&self, _allow: &[String]) -> bool { false }
+    fn probe_apps(&self, _apps: &[String]) -> signal::AppProbe { signal::AppProbe::default() }
 }

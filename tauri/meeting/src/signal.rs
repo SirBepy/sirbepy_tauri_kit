@@ -5,28 +5,47 @@ use serde::Serialize;
 /// Snapshot of the three raw signals at one poll.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct Sources {
+    /// A browser currently holds the camera (web video call).
     pub camera: bool,
+    /// A browser currently holds the mic (web call: Google Meet, Zoom-web).
     pub mic: bool,
-    pub audio: bool,
+    /// A native meeting app currently holds the mic device (desktop call).
+    /// Mic-hold, not playback: the device stays held the whole call even while
+    /// muted, and a notification ping / voice-message playback never holds it.
+    pub app_mic: bool,
 }
 
-/// Reads the three raw signals. Implemented by the OS layer; faked in tests.
+/// Per-app diagnostic snapshot, logged (not used for the decision) so we can see
+/// each app's real behavior: holding the mic device vs merely playing audio.
+/// This is how we learn whether an always-on-mic app like Discord can ever be
+/// auto-detected by mic-hold, or must stay manual-toggle only.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct AppProbe {
+    /// App process names currently holding the mic device (LastUsedTimeStop == 0).
+    pub mic_held: Vec<String>,
+    /// App process names with an active audio *render* (playback) session.
+    pub audio_playing: Vec<String>,
+}
+
+/// Reads the raw signals. Implemented by the OS layer; faked in tests.
 pub trait SignalSource: Send {
     /// True if a process whose name matches `browsers` currently holds the camera.
-    /// Scoped to browsers because native meeting apps are covered by the audio-session
-    /// check; an unscoped check false-fires on any app that parks the device.
+    /// Scoped to browsers because native meeting apps are covered by `probe_apps`;
+    /// an unscoped check false-fires on any app that parks the device.
     fn camera_in_use(&self, browsers: &[String]) -> bool;
     /// True if a process whose name matches `browsers` currently holds the mic.
     /// Scoped to browsers for the same reason as `camera_in_use` (e.g. Discord holds
     /// the mic the whole time it runs for voice-activity detection, call or not).
     fn mic_in_use(&self, browsers: &[String]) -> bool;
-    /// True if any process whose name matches `allow` has an active audio render session.
-    fn meeting_app_audio_active(&self, allow: &[String]) -> bool;
+    /// Probe each app in `apps`: which hold the mic device vs which are merely
+    /// playing audio. The watcher derives the native `app_mic` signal from
+    /// `mic_held` and logs the rest for diagnostics.
+    fn probe_apps(&self, apps: &[String]) -> AppProbe;
 }
 
-/// Combine the three raw signals into a single "in meeting" boolean.
+/// Combine the raw signals into a single "in meeting" boolean.
 pub fn compute_in_meeting(s: Sources) -> bool {
-    s.camera || s.mic || s.audio
+    s.camera || s.mic || s.app_mic
 }
 
 /// Case-insensitive match of a process image name against the allow list.
@@ -56,7 +75,7 @@ mod tests {
         assert!(!compute_in_meeting(Sources::default()));
         assert!(compute_in_meeting(Sources { camera: true, ..Default::default() }));
         assert!(compute_in_meeting(Sources { mic: true, ..Default::default() }));
-        assert!(compute_in_meeting(Sources { audio: true, ..Default::default() }));
+        assert!(compute_in_meeting(Sources { app_mic: true, ..Default::default() }));
     }
 
     #[test]
