@@ -66,6 +66,38 @@ pub fn process_name_from_consent_key(key: &str) -> &str {
     }
 }
 
+/// Map a known meeting-app exe name (lowercase) to its Store package family name
+/// prefix (lowercase). Only apps where the packaged version is distinct from the
+/// classic installer version and uses a known family name are listed here.
+fn exe_to_package_family_prefix(exe: &str) -> Option<&'static str> {
+    match exe.to_ascii_lowercase().as_str() {
+        "ms-teams.exe" => Some("msteams"),
+        _ => None,
+    }
+}
+
+/// Check if a packaged app family key (e.g. `MSTeams_8wekyb3d8bbwe`) matches any
+/// entry in `allow`. Two strategies:
+///   1. Direct match (case-insensitive) — users can list a family name explicitly.
+///   2. Built-in exe-to-family-prefix map — `ms-teams.exe` matches any key that
+///      starts with `msteams` (case-insensitive), so new Teams is caught without
+///      users having to know the family name.
+/// Returns the matching allow-list entry so callers can push the canonical name.
+pub fn packaged_family_match<'a>(family_key: &str, allow: &'a [String]) -> Option<&'a str> {
+    let key_lower = family_key.to_ascii_lowercase();
+    for entry in allow {
+        if family_key.eq_ignore_ascii_case(entry) {
+            return Some(entry.as_str());
+        }
+        if let Some(prefix) = exe_to_package_family_prefix(entry) {
+            if key_lower.starts_with(prefix) {
+                return Some(entry.as_str());
+            }
+        }
+    }
+    None
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -105,5 +137,30 @@ mod tests {
         // Discord parks the mic but is not a browser, so it must not match.
         let name = process_name_from_consent_key("C:#Users#me#AppData#Discord#Discord.exe");
         assert!(!process_name_matches(name, &browsers));
+    }
+
+    #[test]
+    fn packaged_family_key_matches_new_teams() {
+        let apps = vec!["ms-teams.exe".to_string(), "zoom.exe".to_string()];
+        // New Teams (Store): family key starts with "MSTeams".
+        assert_eq!(
+            packaged_family_match("MSTeams_8wekyb3d8bbwe", &apps),
+            Some("ms-teams.exe")
+        );
+        // Case variation in family key still matches.
+        assert_eq!(
+            packaged_family_match("msteams_8wekyb3d8bbwe", &apps),
+            Some("ms-teams.exe")
+        );
+        // Direct listing of the family name also works.
+        let apps_with_family = vec!["MSTeams_8wekyb3d8bbwe".to_string()];
+        assert_eq!(
+            packaged_family_match("MSTeams_8wekyb3d8bbwe", &apps_with_family),
+            Some("MSTeams_8wekyb3d8bbwe")
+        );
+        // Unrelated Store app does not match.
+        assert_eq!(packaged_family_match("Microsoft.SkypeApp_kzf8qxf38zg5c", &apps), None);
+        // Zoom (non-packaged exe in list) does not match a random family key.
+        assert_eq!(packaged_family_match("zoom_somepackageid", &apps), None);
     }
 }

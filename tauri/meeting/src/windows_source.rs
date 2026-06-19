@@ -14,7 +14,10 @@
 
 #![cfg(windows)]
 
-use crate::signal::{process_name_from_consent_key, process_name_matches, AppProbe, SignalSource};
+use crate::signal::{
+    packaged_family_match, process_name_from_consent_key, process_name_matches, AppProbe,
+    SignalSource,
+};
 use std::collections::HashMap;
 
 pub struct WindowsSignalSource;
@@ -124,14 +127,24 @@ fn active_children(parent: &str, allow: &[String]) -> Vec<String> {
         }
         let child = String::from_utf16_lossy(&name_buf[..name_len as usize]);
         index += 1;
-        let name = process_name_from_consent_key(&child);
-        // Only listed processes count; a parked device on any other app is noise.
-        if !process_name_matches(name, allow) {
-            continue;
-        }
+        // Determine the canonical name to record and whether this child matches.
+        // NonPackaged keys contain '#' (full exe path); packaged keys are family
+        // names (no '#') and need the packaged-family matching path.
+        let hits_name: String = if child.contains('#') {
+            let name = process_name_from_consent_key(&child);
+            if !process_name_matches(name, allow) {
+                continue;
+            }
+            name.to_string()
+        } else {
+            match packaged_family_match(&child, allow) {
+                Some(m) => m.to_string(),
+                None => continue,
+            }
+        };
         let full = format!("{parent}\\{child}");
         if last_used_stop_is_zero(&full) {
-            hits.push(name.to_string());
+            hits.push(hits_name);
         }
     }
     unsafe {
