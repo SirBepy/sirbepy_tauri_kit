@@ -1,6 +1,7 @@
 import { html, type TemplateResult } from "lit-html";
 import { invoke } from "@tauri-apps/api/core";
-import type { Field } from "./schema";
+import type { Field, SettingsValue } from "./schema";
+import { keybindControls } from "./keybind";
 
 /** Renders the label cell with an optional tooltip info-icon. */
 function labelCell(field: Field): TemplateResult {
@@ -18,11 +19,17 @@ function labelCell(field: Field): TemplateResult {
   `;
 }
 
-/** Renders one field as a labeled row. Used by section pages and inline rows. */
+/**
+ * Renders one field as a labeled row. Used by section pages and inline rows.
+ * `current` is the full settings map; only the keybind case reads it (for
+ * display-only conflict detection). Other field kinds ignore it, so existing
+ * callers that omit it stay backward-compatible.
+ */
 export function fieldRow(
   field: Field,
   value: unknown,
   onChange: (next: unknown) => void,
+  current: SettingsValue = {},
 ): TemplateResult {
   switch (field.kind) {
     case "number":
@@ -160,6 +167,13 @@ export function fieldRow(
         </label>
       `;
     }
+    case "keybind":
+      return html`
+        <label class="kit-row">
+          ${labelCell(field)}
+          ${keybindControls(value, current, field.key, onChange)}
+        </label>
+      `;
     case "custom":
       return field.render(value, onChange);
   }

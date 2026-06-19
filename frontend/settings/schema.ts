@@ -63,6 +63,19 @@ export interface CustomField extends BaseField {
   ) => TemplateResult;
 }
 
+/**
+ * A global-hotkey binding rendered as label + accelerator badge + Record/Clear.
+ * Stored as a plain accelerator string (e.g. "Ctrl+Alt+P") or null when unset.
+ * Capture, accelerator formatting, and display-only cross-row conflict
+ * detection are handled by the kit. Consumers declare the field as data only.
+ *
+ * Reset rule: each keybind key MUST also exist on the app's Rust Settings struct
+ * + Default impl (as Option<String> default None), or it resets on restart.
+ */
+export interface KeybindField extends BaseField {
+  kind: "keybind";
+}
+
 export type Field =
   | NumberField
   | IntegerField
@@ -71,6 +84,7 @@ export type Field =
   | ToggleField
   | TextField
   | FileField
+  | KeybindField
   | CustomField;
 
 export interface SectionGroup {

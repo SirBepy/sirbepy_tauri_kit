@@ -12,7 +12,7 @@ function renderFields(
 ) {
   return fields
     .filter((f) => !f.visibleWhen || f.visibleWhen(current))
-    .map((f) => fieldRow(f, current[f.key], (v) => onChange(f.key, v)));
+    .map((f) => fieldRow(f, current[f.key], (v) => onChange(f.key, v), current));
 }
 
 function renderGroup(

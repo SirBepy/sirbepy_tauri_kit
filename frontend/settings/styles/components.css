@@ -168,6 +168,32 @@
   white-space: nowrap;
 }
 
+/* ==== KEYBIND FIELD (accelerator badge + Record/Clear) ==== */
+.kit-keybind-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kit-keybind-badge {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 3px 10px;
+  min-width: 90px;
+  text-align: center;
+  white-space: nowrap;
+}
+.kit-keybind-badge--conflict {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+.kit-keybind-record-btn.recording {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 /* ==== BUTTONS (claude_usage btn look) ==== */
 .kit-btn-primary, .kit-btn-secondary, .kit-btn-danger {
   padding: var(--kit-btn-pad, 7px 16px);
