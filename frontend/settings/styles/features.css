@@ -2,7 +2,6 @@
 .kit-about-page {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 49px); /* viewport minus sticky header */
 }
 
 /* ==== ABOUT HERO ==== */
@@ -21,15 +20,50 @@
   cursor: pointer;
   user-select: none;
 }
-.kit-about-meta {
-  font-size: 11px;
-  color: var(--kit-text-dim);
-  margin-top: 2px;
-}
 .kit-about-status {
   font-size: 11px;
   color: var(--kit-text-dim);
   margin-top: 8px;
+}
+
+/* ==== INFO CARDS ==== */
+.kit-about-info-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+.kit-about-info-card {
+  border: 1px solid var(--kit-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--kit-bg-alt);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.kit-about-info-icon {
+  font-size: 15px;
+  color: var(--kit-accent);
+  margin-bottom: 2px;
+}
+.kit-about-info-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--kit-text-dim);
+}
+.kit-about-info-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--kit-text);
+  line-height: 1.5;
+}
+.kit-about-info-time {
+  font-size: 11px;
+  color: var(--kit-text-dim);
+  font-weight: 400;
 }
 
 /* ==== DEVELOPER LINKS ==== */

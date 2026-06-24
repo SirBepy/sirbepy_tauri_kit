@@ -44,6 +44,15 @@ export interface AboutPageDeps {
   onRerender?: () => void;
 }
 
+/** Parse a date string like "2026-06-15" or "2026-06-15 14:23" into display parts. */
+function parseAboutDate(raw: string): { date: string; time?: string } {
+  const parts = raw.trim().split(" ");
+  const [y, m, d] = (parts[0] ?? "").split("-").map(Number);
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  if (!y || !m || !d || !months[m - 1]) return { date: raw };
+  return { date: `${months[m - 1]} ${d}, ${y}`, time: parts[1] };
+}
+
 /** Phosphor icon class for a known link key. */
 function iconClassFor(linkKey: string): string {
   switch (linkKey) {
@@ -111,13 +120,38 @@ export function aboutPage(deps: AboutPageDeps): PageDef {
       <div class="kit-about-hero">
         <div class="kit-about-app-name">${deps.appName}</div>
         <div class="kit-about-version" @click=${onVersionTap}>v${deps.version}</div>
-        ${deps.buildDate ? html`<div class="kit-about-meta">Built ${deps.buildDate}</div>` : null}
-        ${deps.installedAt ? html`<div class="kit-about-meta">Installed ${deps.installedAt}</div>` : null}
         <div
           class="kit-about-status"
           style=${deps.update?.statusColor ? `color: ${deps.update.statusColor}` : ""}
         >${deps.update?.statusText ?? "Up to date"}</div>
       </div>
+
+      ${(deps.buildDate || deps.installedAt) ? html`
+        <div class="kit-about-info-cards">
+          ${deps.buildDate ? (() => {
+            const { date, time } = parseAboutDate(deps.buildDate!);
+            return html`
+              <div class="kit-about-info-card">
+                <i class="ph ph-hammer kit-about-info-icon"></i>
+                <div class="kit-about-info-label">Built</div>
+                <div class="kit-about-info-value">
+                  ${date}${time ? html`<br><span class="kit-about-info-time">${time} UTC</span>` : null}
+                </div>
+              </div>`;
+          })() : null}
+          ${deps.installedAt ? (() => {
+            const { date, time } = parseAboutDate(deps.installedAt!);
+            return html`
+              <div class="kit-about-info-card">
+                <i class="ph ph-download-simple kit-about-info-icon"></i>
+                <div class="kit-about-info-label">Installed</div>
+                <div class="kit-about-info-value">
+                  ${date}${time ? html`<br><span class="kit-about-info-time">${time} UTC</span>` : null}
+                </div>
+              </div>`;
+          })() : null}
+        </div>
+      ` : null}
 
       <div class="kit-section">
         <label class="kit-row">
