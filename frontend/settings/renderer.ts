@@ -7,7 +7,8 @@ import { PageStack } from "./stack";
 import { rootPage } from "./pages/root";
 import { sectionPage } from "./pages/section";
 import { applyTheme, DEFAULT_MODE, type PaletteDef, type ThemeValue } from "./pages/theme";
-import { aboutPage, type AutoUpdateMode } from "./pages/about";
+import { aboutPage, type AboutUpdateDeps, type AutoUpdateMode } from "./pages/about";
+import type { Update } from "@tauri-apps/plugin-updater";
 import { systemPage } from "./pages/system";
 import { resetModal } from "./pages/reset-modal";
 
@@ -157,6 +158,45 @@ export async function renderSettingsPage(
       name: opts.about?.developer?.name ?? KIT_DEFAULTS.developer.name,
       links: { ...KIT_DEFAULTS.developer.links, ...opts.about?.developer?.links },
     };
+
+    // Mutated in place by the check/download/relaunch flow below; aboutPage's
+    // render() reads these fields fresh on every stack.rerender() call.
+    const updateState: AboutUpdateDeps = {};
+    let pendingUpdate: Update | null = null;
+
+    const installPendingUpdate = async () => {
+      const update = pendingUpdate;
+      if (!update) return;
+      const { downloadAndInstallWithProgress } = await import("../updater/check");
+      updateState.statusText = "Downloading… 0%";
+      updateState.statusColor = undefined;
+      updateState.actionLabel = undefined;
+      updateState.onAction = undefined;
+      stack.rerender();
+      try {
+        await downloadAndInstallWithProgress(update, ({ downloaded, total }) => {
+          updateState.statusText = total
+            ? `Downloading… ${Math.round((downloaded / total) * 100)}%`
+            : `Downloading… ${Math.round(downloaded / 1024)} KB`;
+          stack.rerender();
+        });
+        updateState.statusText = `Update v${update.version} installed`;
+        updateState.actionLabel = "Relaunch now";
+        updateState.onAction = () => {
+          void (async () => {
+            const { relaunch } = await import("@tauri-apps/plugin-process");
+            await relaunch();
+          })();
+        };
+      } catch (err) {
+        updateState.statusText = `Update failed: ${String(err)}`;
+        updateState.statusColor = "var(--kit-danger)";
+        updateState.actionLabel = "Retry";
+        updateState.onAction = () => void installPendingUpdate();
+      }
+      stack.rerender();
+    };
+
     stack.push(
       aboutPage({
         appName,
@@ -165,14 +205,28 @@ export async function renderSettingsPage(
         autoUpdate: ((current["__kit_auto_update"] as AutoUpdateMode) ?? "onStartup"),
         onAutoUpdateChange: (m) => void setField("__kit_auto_update", m),
         onCheckNow: async () => {
-          const { checkAndPromptUpdate } = await import("../updater/check");
-          await checkAndPromptUpdate();
+          const { check } = await import("@tauri-apps/plugin-updater");
+          const update = await check();
+          if (!update) {
+            pendingUpdate = null;
+            updateState.statusText = "Up to date";
+            updateState.statusColor = undefined;
+            updateState.actionLabel = undefined;
+            updateState.onAction = undefined;
+            return;
+          }
+          pendingUpdate = update;
+          updateState.statusText = `Update v${update.version} available`;
+          updateState.statusColor = undefined;
+          updateState.actionLabel = "Download & Install";
+          updateState.onAction = () => void installPendingUpdate();
         },
         onCopyLogs: async () => {
           const logs = await invoke<string>("kit_copy_logs");
           await navigator.clipboard.writeText(logs);
         },
         onBack: () => stack.pop(),
+        update: updateState,
         onRerender: () => stack.rerender(),
       }),
     );

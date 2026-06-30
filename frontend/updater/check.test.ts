@@ -58,3 +58,45 @@ describe("checkAndPromptUpdate", () => {
     expect(messageMock).toHaveBeenCalledWith(expect.stringContaining("network down"), expect.objectContaining({ title: "Update error" }));
   });
 });
+
+describe("downloadAndInstallWithProgress", () => {
+  it("reports downloaded/total bytes through Started, Progress, and Finished events", async () => {
+    const onProgress = vi.fn();
+    const downloadAndInstall = vi.fn(async (onEvent: (e: unknown) => void) => {
+      onEvent({ event: "Started", data: { contentLength: 1000 } });
+      onEvent({ event: "Progress", data: { chunkLength: 400 } });
+      onEvent({ event: "Progress", data: { chunkLength: 600 } });
+      onEvent({ event: "Finished" });
+    });
+
+    const { downloadAndInstallWithProgress } = await import("./check");
+    await downloadAndInstallWithProgress({ downloadAndInstall } as never, onProgress);
+
+    expect(onProgress).toHaveBeenNthCalledWith(1, { downloaded: 0, total: 1000 });
+    expect(onProgress).toHaveBeenNthCalledWith(2, { downloaded: 400, total: 1000 });
+    expect(onProgress).toHaveBeenNthCalledWith(3, { downloaded: 1000, total: 1000 });
+    expect(onProgress).toHaveBeenNthCalledWith(4, { downloaded: 1000, total: 1000 });
+  });
+
+  it("reports total: null when the server omits content length", async () => {
+    const onProgress = vi.fn();
+    const downloadAndInstall = vi.fn(async (onEvent: (e: unknown) => void) => {
+      onEvent({ event: "Started", data: {} });
+      onEvent({ event: "Progress", data: { chunkLength: 200 } });
+    });
+
+    const { downloadAndInstallWithProgress } = await import("./check");
+    await downloadAndInstallWithProgress({ downloadAndInstall } as never, onProgress);
+
+    expect(onProgress).toHaveBeenLastCalledWith({ downloaded: 200, total: null });
+  });
+
+  it("works without an onProgress callback", async () => {
+    const downloadAndInstall = vi.fn(async (onEvent: (e: unknown) => void) => {
+      onEvent({ event: "Started", data: { contentLength: 10 } });
+    });
+
+    const { downloadAndInstallWithProgress } = await import("./check");
+    await expect(downloadAndInstallWithProgress({ downloadAndInstall } as never)).resolves.toBeUndefined();
+  });
+});
