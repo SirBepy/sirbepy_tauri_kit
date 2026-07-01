@@ -44,7 +44,8 @@ export class PageStack {
 
   /** Returns the active page id, or null if stack empty. */
   activeId(): string | null {
-    return this.stack.length > 0 ? this.stack[this.stack.length - 1].id : null;
+    const top = this.stack[this.stack.length - 1];
+    return top ? top.id : null;
   }
 
   private paint(): void {
