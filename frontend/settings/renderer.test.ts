@@ -81,6 +81,9 @@ describe("renderSettingsPage v2", () => {
 
     const nav = root.querySelector<HTMLElement>('[data-nav="system"]')!;
     nav.click();
+    // navSystem defers its stack.push through `hydrated.then(...)` (see renderer.ts) -
+    // flush that microtask before asserting on the pushed page's DOM.
+    await Promise.resolve();
     expect(root.querySelector('select[data-key="__kit_theme"]')).toBeTruthy();
     // About is on root now, not inside System subpage.
     expect(root.querySelector('[data-nav="about"]')).toBeFalsy();

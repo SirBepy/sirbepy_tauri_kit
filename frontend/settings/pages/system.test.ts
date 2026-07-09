@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render } from "lit-html";
+import { render, html } from "lit-html";
 import { systemPage } from "./system";
 import type { DangerAction } from "../renderer";
 import type { Field } from "../schema";
@@ -120,5 +120,56 @@ describe("systemPage", () => {
     render(page.render(), root);
     root.querySelector<HTMLButtonElement>('[data-palette="cosmo"]')!.click();
     expect(calls).toEqual(["cosmo"]);
+  });
+
+  describe("sections-as-data", () => {
+    it("renders a data section's title and Field[] rows, wired to onChange", () => {
+      const calls: Array<[string, unknown]> = [];
+      const page = systemPage(defaultDeps({
+        sections: [
+          { title: "Startup", fields: [{ key: "autostart", kind: "toggle", label: "Launch at login" }] },
+        ],
+        current: { autostart: true },
+        onChange: (k, v) => calls.push([k, v]),
+      }));
+      render(page.render(), root);
+      const titles = Array.from(root.querySelectorAll(".kit-section-title")).map((t) => t.textContent);
+      expect(titles).toContain("Startup");
+      const toggle = root.querySelector<HTMLInputElement>('input[data-key="autostart"]')!;
+      expect(toggle.checked).toBe(true);
+      toggle.click();
+      expect(calls).toEqual([["autostart", false]]);
+    });
+
+    it("renders a section's custom render() escape hatch", () => {
+      const page = systemPage(defaultDeps({
+        sections: [{ title: "Custom", render: () => html`<div class="my-custom-section">hi</div>` }],
+      }));
+      render(page.render(), root);
+      expect(root.querySelector(".my-custom-section")?.textContent).toBe("hi");
+    });
+
+    it("renders multiple sections in order", () => {
+      const page = systemPage(defaultDeps({
+        onReset: undefined,
+        dangerActions: [],
+        sections: [
+          { title: "First", render: () => html`<span>1</span>` },
+          { title: "Second", render: () => html`<span>2</span>` },
+        ],
+      }));
+      render(page.render(), root);
+      const titles = Array.from(root.querySelectorAll(".kit-section-title")).map((t) => t.textContent);
+      expect(titles).toEqual(["First", "Second"]);
+    });
+  });
+
+  it("renders nothing but the shell when every optional prop is omitted", () => {
+    const page = systemPage({ onBack: () => {} });
+    render(page.render(), root);
+    expect(root.querySelector('[data-row="theme"]')).toBeFalsy();
+    expect(root.querySelector('[data-row="palette"]')).toBeFalsy();
+    expect(root.querySelector('[data-action="reset"]')).toBeFalsy();
+    expect(root.querySelectorAll(".kit-section").length).toBe(0);
   });
 });
