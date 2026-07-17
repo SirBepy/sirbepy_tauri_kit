@@ -34,11 +34,22 @@ export interface ThemeConfig {
   defaultPalette?: string;
 }
 
+export interface AboutVersionInfo {
+  buildDate?: string;
+  installedAt?: string;
+}
+
 export interface RenderOptions {
   schema: SettingsSchema;
   systemInline?: Field[];
   dangerActions?: DangerAction[];
   about?: AboutConfig;
+  /**
+   * Resolves the About page's "Built"/"Installed" info cards. Called lazily
+   * inside navAbout(), same as the appName/version lookups below, so apps
+   * that never open About never pay for it.
+   */
+  getVersionInfo?: () => Promise<AboutVersionInfo>;
   theme?: ThemeConfig;
   /** Opt-in named palettes. When provided, the System page shows a palette picker. */
   palettes?: PaletteDef[];
@@ -158,6 +169,12 @@ export async function renderSettingsPage(
       name: opts.about?.developer?.name ?? KIT_DEFAULTS.developer.name,
       links: { ...KIT_DEFAULTS.developer.links, ...opts.about?.developer?.links },
     };
+    let versionInfo: AboutVersionInfo = {};
+    if (opts.getVersionInfo) {
+      try {
+        versionInfo = await opts.getVersionInfo();
+      } catch { /* ignore, cards just stay hidden */ }
+    }
 
     // Mutated in place by the check/download/relaunch flow below; aboutPage's
     // render() reads these fields fresh on every stack.rerender() call.
@@ -201,6 +218,8 @@ export async function renderSettingsPage(
       aboutPage({
         appName,
         version,
+        buildDate: versionInfo.buildDate,
+        installedAt: versionInfo.installedAt,
         developer,
         autoUpdate: ((current["__kit_auto_update"] as AutoUpdateMode) ?? "onStartup"),
         onAutoUpdateChange: (m) => void setField("__kit_auto_update", m),
