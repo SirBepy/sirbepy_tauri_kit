@@ -95,6 +95,9 @@ export interface SectionGroup {
 
 export interface Section {
   title: string;
+  /** Root-nav heading this section groups under. Sections sharing a category
+   * render together in first-appearance order; omit to render ungrouped. */
+  category?: string;
   /** Flat layout: a single list of fields under the section header. */
   fields?: Field[];
   /** Grouped layout: multiple sub-sections, each with an optional sub-header. */

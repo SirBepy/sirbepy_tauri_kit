@@ -69,4 +69,59 @@ describe("rootPage", () => {
     expect(root.querySelector<HTMLElement>('[data-nav="system"]')).toBeTruthy();
     expect(root.querySelector<HTMLElement>('[data-nav="about"]')).toBeTruthy();
   });
+
+  it("sections without a category render with no heading", () => {
+    const page = rootPage(defaultDeps());
+    render(page.render(), root);
+    expect(root.querySelector(".kit-section-title")).toBeFalsy();
+  });
+
+  it("groups sections under their own declared category heading", () => {
+    const schema: SettingsSchema = {
+      sections: [
+        { title: "Widgets", category: "General", fields: [] },
+        { title: "Host", category: "General", fields: [] },
+      ],
+    };
+    const page = rootPage(defaultDeps({ schema }));
+    render(page.render(), root);
+    const titles = Array.from(root.querySelectorAll(".kit-section-title")).map(
+      (el) => el.textContent?.trim(),
+    );
+    expect(titles).toEqual(["General"]);
+  });
+
+  it("merges a non-consecutive category into one heading, preserving first-appearance order", () => {
+    const schema: SettingsSchema = {
+      sections: [
+        { title: "Timer", category: "Pomodoro", fields: [] },
+        { title: "Overlay", category: "Preferences", fields: [] },
+        { title: "Focus mode", category: "Pomodoro", fields: [] },
+      ],
+    };
+    const page = rootPage(defaultDeps({ schema }));
+    render(page.render(), root);
+    const titles = Array.from(root.querySelectorAll(".kit-section-title")).map(
+      (el) => el.textContent?.trim(),
+    );
+    // One "Pomodoro" heading, ordered first since Timer appears before Overlay.
+    expect(titles).toEqual(["Pomodoro", "Preferences"]);
+    const pomodoroGroup = root.querySelectorAll(".kit-section")[0];
+    const rowLabels = Array.from(pomodoroGroup.querySelectorAll(".kit-row-label")).map(
+      (el) => el.textContent,
+    );
+    expect(rowLabels).toEqual(["Timer", "Focus mode"]);
+  });
+
+  it("appends System and About to the last group even when it has a category", () => {
+    const schema: SettingsSchema = {
+      sections: [{ title: "Stats", category: "General", fields: [] }],
+    };
+    const page = rootPage(defaultDeps({ schema }));
+    render(page.render(), root);
+    const group = root.querySelector(".kit-section")!;
+    expect(group.querySelector(".kit-section-title")?.textContent?.trim()).toBe("General");
+    expect(group.querySelector('[data-nav="system"]')).toBeTruthy();
+    expect(group.querySelector('[data-nav="about"]')).toBeTruthy();
+  });
 });
