@@ -1,5 +1,6 @@
-//! Meeting detection: polls Windows for camera/mic use and meeting-app audio,
-//! emits raw `meeting://changed` edges, and exposes a `kit_meeting_state` query.
+//! Meeting detection: polls Windows for camera/mic use (browser-scoped, see
+//! `signal::SignalSource`) and meeting-app audio (mic-hold), emits raw
+//! `meeting://changed` edges, and exposes a `kit_meeting_state` query.
 //! Consumers apply their own latch/override policy on top of the raw edges.
 
 pub mod signal;
