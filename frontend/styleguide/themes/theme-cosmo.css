@@ -40,3 +40,15 @@
   --badge-tech-bg: #ece2dc;
   --shadow-card: 0 4px 20px rgba(160,60,20,0.08);
 }
+
+/* Cosmo - Domain tokens (AUQ question-card chips). */
+[data-theme="cosmo"] {
+  --color-domain-ux: #f472b6; --color-domain-arch: #818cf8; --color-domain-sec: #ef4444;
+  --color-domain-data: #4ade80; --color-domain-tooling: #ef6ff6;
+  --color-domain-infra: #fb923c; --color-domain-billing: #22d3ee;
+}
+[data-theme="cosmo"][data-mode="light"] {
+  --color-domain-ux: #db2777; --color-domain-arch: #4338ca; --color-domain-sec: #dc2626;
+  --color-domain-data: #16a34a; --color-domain-tooling: #d21ad5;
+  --color-domain-infra: #c2600f; --color-domain-billing: #0e7490;
+}

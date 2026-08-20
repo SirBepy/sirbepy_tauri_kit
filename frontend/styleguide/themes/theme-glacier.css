@@ -40,3 +40,15 @@
   --badge-tech-bg: #dfe6ee;
   --shadow-card: 0 4px 16px rgba(50,80,120,0.08);
 }
+
+/* Glacier - Domain tokens (AUQ question-card chips). */
+[data-theme="glacier"] {
+  --color-domain-ux: #38bdf8; --color-domain-arch: #818cf8; --color-domain-sec: #f87171;
+  --color-domain-data: #34d399; --color-domain-tooling: #f182f7;
+  --color-domain-infra: #fb923c; --color-domain-billing: #2dd4bf;
+}
+[data-theme="glacier"][data-mode="light"] {
+  --color-domain-ux: #0284c7; --color-domain-arch: #4f46e5; --color-domain-sec: #dc2626;
+  --color-domain-data: #059669; --color-domain-tooling: #b817b2;
+  --color-domain-infra: #c2600f; --color-domain-billing: #0d9488;
+}

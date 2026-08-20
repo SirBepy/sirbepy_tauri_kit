@@ -40,3 +40,15 @@
   --badge-tech-bg: #dae8e6;
   --shadow-card: 0 4px 24px rgba(20,80,70,0.08);
 }
+
+/* Nebula - Domain tokens (AUQ question-card chips). */
+[data-theme="nebula"] {
+  --color-domain-ux: #c084fc; --color-domain-arch: #60a5fa; --color-domain-sec: #f06060;
+  --color-domain-data: #6ee7b7; --color-domain-tooling: #f877e7;
+  --color-domain-infra: #fbbf24; --color-domain-billing: #2dd4bf;
+}
+[data-theme="nebula"][data-mode="light"] {
+  --color-domain-ux: #9333ea; --color-domain-arch: #2563eb; --color-domain-sec: #dc2626;
+  --color-domain-data: #16a34a; --color-domain-tooling: #d719bd;
+  --color-domain-infra: #b45309; --color-domain-billing: #0d9488;
+}
