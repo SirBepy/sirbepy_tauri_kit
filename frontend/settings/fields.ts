@@ -1,7 +1,12 @@
 import { html, type TemplateResult } from "lit-html";
-import { invoke } from "@tauri-apps/api/core";
 import type { Field, SettingsValue } from "./schema";
 import { keybindControls } from "./keybind";
+
+/** Injected dependencies for field kinds that touch a host API. */
+export interface FieldRowDeps {
+  /** Backs the "file" kind's Pick button. Omit it to disable picking. */
+  pickFile?: (cmd: string) => Promise<string | null>;
+}
 
 /** Renders the label cell with an optional tooltip info-icon. */
 function labelCell(field: Field): TemplateResult {
@@ -30,6 +35,7 @@ export function fieldRow(
   value: unknown,
   onChange: (next: unknown) => void,
   current: SettingsValue = {},
+  deps: FieldRowDeps = {},
 ): TemplateResult {
   switch (field.kind) {
     case "number":
@@ -156,7 +162,8 @@ export function fieldRow(
               data-key=${field.key}
               class="kit-btn-secondary"
               @click=${async () => {
-                const picked = await invoke<string | null>(field.pickerCommand);
+                if (!deps.pickFile) return;
+                const picked = await deps.pickFile(field.pickerCommand);
                 if (picked) onChange(picked);
               }}
             >
