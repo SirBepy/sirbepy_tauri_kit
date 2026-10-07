@@ -1,0 +1,148 @@
+/* ── Resize strips ──
+   Each strip straddles the border, mostly OUTSIDE it (8px out, 3px in), so
+   the target is generous without stealing the body's scrollbar. Corners sit
+   above edges. The visible cue is a 2px accent line drawn exactly on the
+   border, grown from the middle; the short delay keeps it from flickering
+   when the pointer just crosses an edge on its way somewhere else. */
+.pw-rz {
+  position: absolute;
+  z-index: 2;
+  touch-action: none;
+}
+
+.pw-rz-n, .pw-rz-s { left: 16px; right: 16px; height: 11px; cursor: ns-resize; }
+.pw-rz-e, .pw-rz-w { top: 16px; bottom: 16px; width: 11px; cursor: ew-resize; }
+.pw-rz-n { top: -8px; }
+.pw-rz-s { bottom: -8px; }
+.pw-rz-e { right: -8px; }
+.pw-rz-w { left: -8px; }
+
+.pw-rz-ne, .pw-rz-nw, .pw-rz-se, .pw-rz-sw { width: 24px; height: 24px; z-index: 3; }
+.pw-rz-nw { top: -8px; left: -8px; cursor: nwse-resize; }
+.pw-rz-se { bottom: -8px; right: -8px; cursor: nwse-resize; }
+.pw-rz-ne { top: -8px; right: -8px; cursor: nesw-resize; }
+.pw-rz-sw { bottom: -8px; left: -8px; cursor: nesw-resize; }
+
+/* Docked: only the inner edge resizes, and it is the split's divider. */
+.pw-window[data-placement="dock"] .pw-rz { display: none; }
+.pw-window[data-placement="dock"][data-side="left"] .pw-rz-e,
+.pw-window[data-placement="dock"][data-side="right"] .pw-rz-w {
+  display: block;
+  top: 0;
+  bottom: 0;
+}
+
+.pw-window[data-placement="dock"][data-side="left"] .pw-rz-e { right: -6px; width: 9px; }
+.pw-window[data-placement="dock"][data-side="right"] .pw-rz-w { left: -6px; width: 9px; }
+
+.pw-rz::after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 120ms ease-out,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pw-rz:hover::after,
+.pw-rz.is-active::after {
+  opacity: 1;
+  transform: none;
+  transition-delay: 70ms;
+}
+
+.pw-rz.is-active::after {
+  transition-delay: 0ms;
+}
+
+/* Edges: a line over the 1px border (offset 7px = the 8px overhang, less 1px
+   so the 2px line centres on the border). */
+.pw-rz-n::after, .pw-rz-s::after {
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-primary);
+  transform: scaleX(0.3);
+}
+
+.pw-rz-n::after { top: 7px; }
+.pw-rz-s::after { bottom: 7px; }
+
+.pw-rz-e::after, .pw-rz-w::after {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--color-primary);
+  transform: scaleY(0.3);
+}
+
+.pw-rz-e::after { right: 7px; }
+.pw-rz-w::after { left: 7px; }
+
+/* A dock divider's line sits on the seam: 6px overhang, less 1px. */
+.pw-window[data-placement="dock"][data-side="left"] .pw-rz-e::after { right: 5px; }
+.pw-window[data-placement="dock"][data-side="right"] .pw-rz-w::after { left: 5px; }
+
+/* Stacked on one side: the lower window's top edge is the divider between the
+   two. Kept inside its own frame, since the window above may paint over an
+   overhang. */
+.pw-window[data-placement="dock"][data-stack-above] {
+  border-top: 1px solid var(--color-border);
+}
+
+.pw-window[data-placement="dock"][data-stack-above] .pw-rz-n {
+  display: block;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+.pw-window[data-placement="dock"][data-stack-above] .pw-rz-n::after { top: -1px; }
+
+/* Corners: an L bracket that follows the window's 10px rounding. */
+.pw-rz-nw::after, .pw-rz-ne::after, .pw-rz-se::after, .pw-rz-sw::after {
+  width: 22px;
+  height: 22px;
+  border: 0 solid var(--color-primary);
+  transform: scale(0.6);
+}
+
+.pw-rz-nw::after {
+  top: 7px;
+  left: 7px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+  border-top-left-radius: 11px;
+  transform-origin: top left;
+}
+
+.pw-rz-ne::after {
+  top: 7px;
+  right: 7px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+  border-top-right-radius: 11px;
+  transform-origin: top right;
+}
+
+.pw-rz-se::after {
+  bottom: 7px;
+  right: 7px;
+  border-bottom-width: 2px;
+  border-right-width: 2px;
+  border-bottom-right-radius: 11px;
+  transform-origin: bottom right;
+}
+
+.pw-rz-sw::after {
+  bottom: 7px;
+  left: 7px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+  border-bottom-left-radius: 11px;
+  transform-origin: bottom left;
+}

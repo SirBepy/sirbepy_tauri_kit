@@ -1,0 +1,71 @@
+/* ── Drag feedback ────────────────────────────────────────────────────────── */
+/* Where a window will land while the pointer sits in a corner or dock zone.
+   Painted over the windows, since the one being dragged usually already
+   covers the zone it is about to land in. */
+.pw-layer > .pw-snap-ghost {
+  position: absolute;
+  z-index: 900;
+  pointer-events: none;
+  border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 70%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  opacity: 0;
+  transform: scale(0.97);
+  transition:
+    opacity 140ms ease-out,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    left 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    top 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pw-layer > .pw-snap-ghost.is-on {
+  opacity: 1;
+  transform: none;
+}
+
+/* The tab being torn off, following the pointer. */
+.pw-layer > .pw-tab-ghost {
+  position: absolute;
+  z-index: 950;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface-alt);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+.pw-tab-ghost i { color: var(--color-primary); }
+
+.pw-window.is-entering {
+  animation: pw-window-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pw-window-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-window,
+  .pw-window.is-snapping,
+  .pw-layer > .pw-snap-ghost,
+  .pw-grip,
+  .pw-rz::after {
+    transition: none;
+  }
+
+  .pw-window.is-entering {
+    animation: none;
+  }
+}
