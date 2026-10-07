@@ -27,6 +27,13 @@ Frontend (lit-html + TS, `frontend/<name>`):
 - `frontend/settings/` — schema-driven settings page: field renderers, keybind
   capture, page/stack navigation, palettes.
 - `frontend/updater/` — auto-update check helpers.
+- `frontend/pane-windows/` - in-app windows over a pane: panels as browser-style
+  tabs in windows that float, snap to a corner, or dock left/right as a real split
+  (stacking top to bottom), with tear-off and merge by drag, and a full-screen
+  one-at-a-time cover on phones. `PaneWindowManager` is generic over the host's
+  panel keys; the host supplies each panel's mount, label and icon, optional extra
+  bar buttons, and persists layouts (`createLayoutStore` is a ready per-owner
+  localStorage store). Import `pane-windows.css` alongside it.
 - `frontend/styleguide/themes/` — the four shared palettes (`void`, `nebula`,
   `glacier`, `cosmo`), each with a dark and light `[data-mode="light"]` block.
 
