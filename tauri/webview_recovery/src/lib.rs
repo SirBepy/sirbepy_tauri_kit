@@ -103,10 +103,11 @@ mod win {
         let handler = ProcessFailedEventHandler::create(Box::new(
             move |sender: Option<ICoreWebView2>,
                   args: Option<ICoreWebView2ProcessFailedEventArgs>| {
+                // The kind's default (0) is BROWSER_PROCESS_EXITED, so an
+                // event with no args must not fall through to a restart.
+                let Some(args) = &args else { return Ok(()) };
                 let mut kind = COREWEBVIEW2_PROCESS_FAILED_KIND::default();
-                if let Some(args) = &args {
-                    unsafe { args.ProcessFailedKind(&mut kind)? };
-                }
+                unsafe { args.ProcessFailedKind(&mut kind)? };
                 match recovery_for(kind.0, started.elapsed()) {
                     Recovery::Reload => {
                         log::warn!("webview_recovery: '{label}' renderer failed (kind {}), reloading", kind.0);
