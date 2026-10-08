@@ -12,7 +12,7 @@ describe("defineSchema", () => {
       ],
     });
     expect(s.sections.length).toBe(1);
-    expect(s.sections[0].fields[0].key).toBe("k");
+    expect(s.sections[0].fields![0].key).toBe("k");
   });
 
   it("accepts grouped sections", () => {
@@ -45,8 +45,8 @@ describe("defineSchema", () => {
         },
       ],
     });
-    expect(s.sections[0].fields[0].kind).toBe("number");
-    expect(s.sections[0].fields[1].kind).toBe("toggle");
-    expect(s.sections[0].fields[2].kind).toBe("select");
+    expect(s.sections[0].fields![0].kind).toBe("number");
+    expect(s.sections[0].fields![1].kind).toBe("toggle");
+    expect(s.sections[0].fields![2].kind).toBe("select");
   });
 });
