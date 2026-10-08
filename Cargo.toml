@@ -6,6 +6,7 @@ members = [
   "tauri/window",
   "tauri/meeting",
   "tauri/audio",
+  "tauri/webview_recovery",
 ]
 
 [workspace.package]

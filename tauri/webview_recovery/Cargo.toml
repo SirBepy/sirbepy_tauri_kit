@@ -1,0 +1,18 @@
+[package]
+name = "tauri_kit_webview_recovery"
+version = "0.0.1"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+tauri = { version = "2.0" }
+log = "0.4"
+
+# Pinned to the line wry 0.55 / tauri 2.11 already resolve, so the
+# `ICoreWebView2Controller` that `PlatformWebview::controller()` hands back is
+# the same type this crate names. A mismatched minor would be a second copy of
+# the bindings and fail to compile against it.
+[target.'cfg(windows)'.dependencies]
+webview2-com = "0.38"
+windows-core = "0.61"

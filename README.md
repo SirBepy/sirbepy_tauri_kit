@@ -19,6 +19,11 @@ Rust crates (`tauri/<name>`, cargo workspace members):
 - `tauri/window` (`tauri_kit_window`) — `exclude_from_capture`, a Windows
   `WDA_EXCLUDEFROMCAPTURE` wrapper that hides a window from screen capture/share
   while it stays visible locally.
+- `tauri/webview_recovery` (`tauri_kit_webview_recovery`) - `plugin()` hooks
+  WebView2 `ProcessFailed` on every webview: a dead or hung renderer reloads, a
+  dead browser process restarts the app via `request_restart` (once, never in the
+  first 60s). Without it a tray app whose `msedgewebview2.exe` died keeps running
+  with a blank window.
 
 Frontend (lit-html + TS, `frontend/<name>`):
 
