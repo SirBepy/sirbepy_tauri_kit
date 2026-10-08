@@ -48,7 +48,7 @@ jobs:
       product_name: ${{ steps.check.outputs.product_name }}
       product_slug: ${{ steps.check.outputs.product_slug }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Resolve version and tag
@@ -76,7 +76,7 @@ jobs:
     if: needs.check.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Create and push tag
         shell: bash
         run: |
@@ -90,13 +90,13 @@ jobs:
     if: needs.check.outputs.should_release == 'true'
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         # The kit is vendored as a submodule and the crates depend on it, so it
         # must be checked out or the build fails resolving tauri_kit_* crates.
         with:
           submodules: recursive
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
           cache: "npm"
@@ -175,7 +175,7 @@ jobs:
           fi
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-windows-x86_64
           path: release-staging/
@@ -186,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts/
           pattern: release-*
@@ -217,7 +217,7 @@ jobs:
           cat latest.json
 
       - name: Upload to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           # Missing globs (e.g. *.sig / latest.json when sign is false) are
           # skipped, not fatal. windows-x86_64.json is an intermediate, not listed.
