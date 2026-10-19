@@ -25,6 +25,13 @@ describe("SIRBEPY_PALETTES", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it("names a group on every palette, each group one contiguous run", () => {
+    const groups = SIRBEPY_PALETTES.map((p) => p.group);
+    expect(groups.every((g) => typeof g === "string" && g.length > 0)).toBe(true);
+    const runs = groups.filter((g, i) => g !== groups[i - 1]);
+    expect(new Set(runs).size).toBe(runs.length);
+  });
+
   for (const p of SIRBEPY_PALETTES) {
     describe(p.id, () => {
       it("is imported by the preset stylesheet", () => {
