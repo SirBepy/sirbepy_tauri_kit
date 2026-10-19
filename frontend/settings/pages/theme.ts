@@ -8,7 +8,9 @@ export type ThemeValue = ThemeMode;
 export interface PaletteDef {
   id: string;
   label: string;
-  /** Swatch preview colours, e.g. [bg, surface, accent], for dark / light. */
+  /** Swatch preview colours for dark / light, rendered left to right on the
+   * picker card. SirBepy's preset uses [background, surface, primary,
+   * secondary, text]; any length works. */
   darkSwatch: string[];
   lightSwatch: string[];
 }
