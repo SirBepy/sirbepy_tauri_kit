@@ -13,6 +13,8 @@ export interface PaletteDef {
    * secondary, text]; any length works. */
   darkSwatch: string[];
   lightSwatch: string[];
+  /** Optional heading a picker can group palettes under, in list order. */
+  group?: string;
 }
 
 /** Single source of truth for mode select options (value + label). */
