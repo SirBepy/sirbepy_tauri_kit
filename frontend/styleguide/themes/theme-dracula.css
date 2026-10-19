@@ -1,0 +1,54 @@
+/* Dracula - Dark */
+[data-theme="dracula"] {
+  --color-primary: #bd93f9;
+  --color-primary-rgb: 189, 147, 249;
+  --color-secondary: #ff79c6;
+  --color-accent: #bd93f9;
+  --color-background: #21222c;
+  --color-surface: #282a36;
+  --color-surface-alt: #343746;
+  --color-text: #f8f8f2;
+  --color-text-muted: #b8bcd6;
+  --color-border: #44475a;
+  --color-success: #50fa7b;
+  --color-danger: #ff5555;
+  --color-info: #8be9fd;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #343746;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Dracula - Light */
+[data-theme="dracula"][data-mode="light"] {
+  --color-primary: #644ac9;
+  --color-primary-rgb: 100, 74, 201;
+  --color-secondary: #a3144d;
+  --color-accent: #644ac9;
+  --color-background: #f6f3e4;
+  --color-surface: #fffbeb;
+  --color-surface-alt: #efeddc;
+  --color-text: #1f1f1f;
+  --color-text-muted: #635d76;
+  --color-border: #dedccf;
+  --color-success: #14710a;
+  --color-danger: #cb3a2a;
+  --color-info: #036a96;
+  --badge-tech-bg: #efeddc;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Dracula - Domain tokens (AUQ question-card chips). */
+[data-theme="dracula"] {
+  --color-domain-ux: #bd93f9; --color-domain-arch: #8be9fd; --color-domain-sec: #ff5555;
+  --color-domain-data: #50fa7b; --color-domain-tooling: #ff79c6;
+  --color-domain-infra: #ffb86c; --color-domain-billing: #f1fa8c;
+}
+[data-theme="dracula"][data-mode="light"] {
+  --color-domain-ux: #644ac9; --color-domain-arch: #036a96; --color-domain-sec: #cb3a2a;
+  --color-domain-data: #14710a; --color-domain-tooling: #a3144d;
+  --color-domain-infra: #a34d14; --color-domain-billing: #846e15;
+}

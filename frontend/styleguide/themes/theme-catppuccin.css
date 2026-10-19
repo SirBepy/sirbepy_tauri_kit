@@ -1,0 +1,54 @@
+/* Catppuccin - Dark */
+[data-theme="catppuccin"] {
+  --color-primary: #cba6f7;
+  --color-primary-rgb: 203, 166, 247;
+  --color-secondary: #89b4fa;
+  --color-accent: #cba6f7;
+  --color-background: #181825;
+  --color-surface: #1e1e2e;
+  --color-surface-alt: #313244;
+  --color-text: #cdd6f4;
+  --color-text-muted: #a6adc8;
+  --color-border: #45475a;
+  --color-success: #a6e3a1;
+  --color-danger: #f38ba8;
+  --color-info: #89b4fa;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #313244;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Catppuccin - Light */
+[data-theme="catppuccin"][data-mode="light"] {
+  --color-primary: #8839ef;
+  --color-primary-rgb: 136, 57, 239;
+  --color-secondary: #1e66f5;
+  --color-accent: #8839ef;
+  --color-background: #e6e9ef;
+  --color-surface: #eff1f5;
+  --color-surface-alt: #dce0e8;
+  --color-text: #4c4f69;
+  --color-text-muted: #5c5f77;
+  --color-border: #ccd0da;
+  --color-success: #3b9227;
+  --color-danger: #d20f39;
+  --color-info: #1e66f5;
+  --badge-tech-bg: #dce0e8;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Catppuccin - Domain tokens (AUQ question-card chips). */
+[data-theme="catppuccin"] {
+  --color-domain-ux: #cba6f7; --color-domain-arch: #89b4fa; --color-domain-sec: #f38ba8;
+  --color-domain-data: #a6e3a1; --color-domain-tooling: #f5c2e7;
+  --color-domain-infra: #fab387; --color-domain-billing: #94e2d5;
+}
+[data-theme="catppuccin"][data-mode="light"] {
+  --color-domain-ux: #8839ef; --color-domain-arch: #1e66f5; --color-domain-sec: #d20f39;
+  --color-domain-data: #3b9227; --color-domain-tooling: #c2459f;
+  --color-domain-infra: #d9520a; --color-domain-billing: #179299;
+}

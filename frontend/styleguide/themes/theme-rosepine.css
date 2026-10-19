@@ -1,0 +1,54 @@
+/* Rose Pine - Dark */
+[data-theme="rosepine"] {
+  --color-primary: #ebbcba;
+  --color-primary-rgb: 235, 188, 186;
+  --color-secondary: #c4a7e7;
+  --color-accent: #ebbcba;
+  --color-background: #191724;
+  --color-surface: #1f1d2e;
+  --color-surface-alt: #26233a;
+  --color-text: #e0def4;
+  --color-text-muted: #a8a5c2;
+  --color-border: #403d52;
+  --color-success: #9ccfd8;
+  --color-danger: #eb6f92;
+  --color-info: #31748f;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #26233a;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Rose Pine - Light */
+[data-theme="rosepine"][data-mode="light"] {
+  --color-primary: #a5566d;
+  --color-primary-rgb: 165, 86, 109;
+  --color-secondary: #907aa9;
+  --color-accent: #a5566d;
+  --color-background: #faf4ed;
+  --color-surface: #fffaf3;
+  --color-surface-alt: #f2e9e1;
+  --color-text: #575279;
+  --color-text-muted: #625e7c;
+  --color-border: #dfdad9;
+  --color-success: #286983;
+  --color-danger: #b4637a;
+  --color-info: #56949f;
+  --badge-tech-bg: #f2e9e1;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Rose Pine - Domain tokens (AUQ question-card chips). */
+[data-theme="rosepine"] {
+  --color-domain-ux: #ebbcba; --color-domain-arch: #c4a7e7; --color-domain-sec: #eb6f92;
+  --color-domain-data: #9ccfd8; --color-domain-tooling: #f6c177;
+  --color-domain-infra: #ea9a97; --color-domain-billing: #5fa3b8;
+}
+[data-theme="rosepine"][data-mode="light"] {
+  --color-domain-ux: #a5566d; --color-domain-arch: #907aa9; --color-domain-sec: #a8435e;
+  --color-domain-data: #286983; --color-domain-tooling: #a86c1f;
+  --color-domain-infra: #c0605a; --color-domain-billing: #3d7f8c;
+}

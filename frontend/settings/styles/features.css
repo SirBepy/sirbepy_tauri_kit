@@ -175,7 +175,9 @@
 }
 .kit-palette-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* Auto-fill, not a fixed column count: 16 palettes in two columns made the
+   * picker eight rows tall, and a wide settings pane has room for more. */
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
 }
 .kit-palette-card {
