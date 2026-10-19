@@ -1,0 +1,54 @@
+/* Crimson - Dark */
+[data-theme="crimson"] {
+  --color-primary: #f43f5e;
+  --color-primary-rgb: 244, 63, 94;
+  --color-secondary: #fb7185;
+  --color-accent: #f43f5e;
+  --color-background: #1a0d10;
+  --color-surface: #251418;
+  --color-surface-alt: #2f1a1f;
+  --color-text: #f5e1e5;
+  --color-text-muted: #bd98a1;
+  --color-border: #3d2229;
+  --color-success: #4ade80;
+  --color-danger: #f87171;
+  --color-info: #fb7185;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #2f1a1f;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Crimson - Light */
+[data-theme="crimson"][data-mode="light"] {
+  --color-primary: #be123c;
+  --color-primary-rgb: 190, 18, 60;
+  --color-secondary: #e11d48;
+  --color-accent: #be123c;
+  --color-background: #fbf1f3;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f6e4e8;
+  --color-text: #2a0f16;
+  --color-text-muted: #7d4a56;
+  --color-border: #ecd0d7;
+  --color-success: #15803d;
+  --color-danger: #b91c1c;
+  --color-info: #e11d48;
+  --badge-tech-bg: #f0dfe3;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Crimson - Domain tokens (AUQ question-card chips). */
+[data-theme="crimson"] {
+  --color-domain-ux: #f43f5e; --color-domain-arch: #818cf8; --color-domain-sec: #fb923c;
+  --color-domain-data: #4ade80; --color-domain-tooling: #e879f9;
+  --color-domain-infra: #fbbf24; --color-domain-billing: #22d3ee;
+}
+[data-theme="crimson"][data-mode="light"] {
+  --color-domain-ux: #be123c; --color-domain-arch: #4338ca; --color-domain-sec: #c2410c;
+  --color-domain-data: #15803d; --color-domain-tooling: #a21caf;
+  --color-domain-infra: #a16207; --color-domain-billing: #0e7490;
+}

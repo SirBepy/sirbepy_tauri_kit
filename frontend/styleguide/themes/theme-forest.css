@@ -1,0 +1,54 @@
+/* Forest - Dark */
+[data-theme="forest"] {
+  --color-primary: #4ade80;
+  --color-primary-rgb: 74, 222, 128;
+  --color-secondary: #a3e635;
+  --color-accent: #4ade80;
+  --color-background: #0f1a14;
+  --color-surface: #16241c;
+  --color-surface-alt: #1c2e23;
+  --color-text: #e2f0e6;
+  --color-text-muted: #8fb39b;
+  --color-border: #24402f;
+  --color-success: #34d399;
+  --color-danger: #f87171;
+  --color-info: #a3e635;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #1c2e23;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Forest - Light */
+[data-theme="forest"][data-mode="light"] {
+  --color-primary: #15803d;
+  --color-primary-rgb: 21, 128, 61;
+  --color-secondary: #4d7c0f;
+  --color-accent: #15803d;
+  --color-background: #eff7f1;
+  --color-surface: #ffffff;
+  --color-surface-alt: #e3f0e7;
+  --color-text: #10251a;
+  --color-text-muted: #4a6b55;
+  --color-border: #c6dccd;
+  --color-success: #047857;
+  --color-danger: #dc2626;
+  --color-info: #4d7c0f;
+  --badge-tech-bg: #e0ebe3;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Forest - Domain tokens (AUQ question-card chips). */
+[data-theme="forest"] {
+  --color-domain-ux: #4ade80; --color-domain-arch: #818cf8; --color-domain-sec: #f87171;
+  --color-domain-data: #2dd4bf; --color-domain-tooling: #f472b6;
+  --color-domain-infra: #fb923c; --color-domain-billing: #38bdf8;
+}
+[data-theme="forest"][data-mode="light"] {
+  --color-domain-ux: #15803d; --color-domain-arch: #4f46e5; --color-domain-sec: #dc2626;
+  --color-domain-data: #0f766e; --color-domain-tooling: #be185d;
+  --color-domain-infra: #c2410c; --color-domain-billing: #0369a1;
+}

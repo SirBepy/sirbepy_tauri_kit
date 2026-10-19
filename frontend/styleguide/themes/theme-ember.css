@@ -1,0 +1,54 @@
+/* Ember - Dark */
+[data-theme="ember"] {
+  --color-primary: #f59e0b;
+  --color-primary-rgb: 245, 158, 11;
+  --color-secondary: #f97316;
+  --color-accent: #f59e0b;
+  --color-background: #1c130c;
+  --color-surface: #271a10;
+  --color-surface-alt: #312116;
+  --color-text: #f5e9dc;
+  --color-text-muted: #b8a088;
+  --color-border: #3d2a1a;
+  --color-success: #84cc16;
+  --color-danger: #ef4444;
+  --color-info: #f97316;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #312116;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Ember - Light */
+[data-theme="ember"][data-mode="light"] {
+  --color-primary: #b45309;
+  --color-primary-rgb: 180, 83, 9;
+  --color-secondary: #c2410c;
+  --color-accent: #b45309;
+  --color-background: #fbf5ee;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f5e9dc;
+  --color-text: #2a1a0c;
+  --color-text-muted: #74563a;
+  --color-border: #ead8c4;
+  --color-success: #4d7c0f;
+  --color-danger: #dc2626;
+  --color-info: #c2410c;
+  --badge-tech-bg: #efe2d3;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Ember - Domain tokens (AUQ question-card chips). */
+[data-theme="ember"] {
+  --color-domain-ux: #f59e0b; --color-domain-arch: #818cf8; --color-domain-sec: #f87171;
+  --color-domain-data: #84cc16; --color-domain-tooling: #f472b6;
+  --color-domain-infra: #38bdf8; --color-domain-billing: #2dd4bf;
+}
+[data-theme="ember"][data-mode="light"] {
+  --color-domain-ux: #b45309; --color-domain-arch: #4f46e5; --color-domain-sec: #dc2626;
+  --color-domain-data: #4d7c0f; --color-domain-tooling: #be185d;
+  --color-domain-infra: #0369a1; --color-domain-billing: #0f766e;
+}

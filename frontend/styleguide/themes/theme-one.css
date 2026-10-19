@@ -1,0 +1,54 @@
+/* One - Dark */
+[data-theme="one"] {
+  --color-primary: #61afef;
+  --color-primary-rgb: 97, 175, 239;
+  --color-secondary: #c678dd;
+  --color-accent: #61afef;
+  --color-background: #21252b;
+  --color-surface: #282c34;
+  --color-surface-alt: #2c313a;
+  --color-text: #abb2bf;
+  --color-text-muted: #979dab;
+  --color-border: #3e4451;
+  --color-success: #98c379;
+  --color-danger: #e06c75;
+  --color-info: #56b6c2;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #2c313a;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* One - Light */
+[data-theme="one"][data-mode="light"] {
+  --color-primary: #3366d6;
+  --color-primary-rgb: 51, 102, 214;
+  --color-secondary: #a626a4;
+  --color-accent: #3366d6;
+  --color-background: #f0f0f0;
+  --color-surface: #fafafa;
+  --color-surface-alt: #e5e5e6;
+  --color-text: #383a42;
+  --color-text-muted: #62646d;
+  --color-border: #d3d3d5;
+  --color-success: #50a14f;
+  --color-danger: #e45649;
+  --color-info: #0184bc;
+  --badge-tech-bg: #e5e5e6;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* One - Domain tokens (AUQ question-card chips). */
+[data-theme="one"] {
+  --color-domain-ux: #61afef; --color-domain-arch: #c678dd; --color-domain-sec: #e06c75;
+  --color-domain-data: #98c379; --color-domain-tooling: #e5c07b;
+  --color-domain-infra: #d19a66; --color-domain-billing: #56b6c2;
+}
+[data-theme="one"][data-mode="light"] {
+  --color-domain-ux: #3366d6; --color-domain-arch: #a626a4; --color-domain-sec: #e45649;
+  --color-domain-data: #50a14f; --color-domain-tooling: #986801;
+  --color-domain-infra: #c18401; --color-domain-billing: #0184bc;
+}

@@ -1,0 +1,54 @@
+/* Gruvbox - Dark */
+[data-theme="gruvbox"] {
+  --color-primary: #fe8019;
+  --color-primary-rgb: 254, 128, 25;
+  --color-secondary: #fabd2f;
+  --color-accent: #fe8019;
+  --color-background: #1d2021;
+  --color-surface: #282828;
+  --color-surface-alt: #3c3836;
+  --color-text: #ebdbb2;
+  --color-text-muted: #bdae93;
+  --color-border: #504945;
+  --color-success: #b8bb26;
+  --color-danger: #fb4934;
+  --color-info: #83a598;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #32302f;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Gruvbox - Light */
+[data-theme="gruvbox"][data-mode="light"] {
+  --color-primary: #af3a03;
+  --color-primary-rgb: 175, 58, 3;
+  --color-secondary: #b57614;
+  --color-accent: #af3a03;
+  --color-background: #fbf1c7;
+  --color-surface: #f9f5d7;
+  --color-surface-alt: #f2e5bc;
+  --color-text: #3c3836;
+  --color-text-muted: #665c54;
+  --color-border: #d5c4a1;
+  --color-success: #79740e;
+  --color-danger: #9d0006;
+  --color-info: #076678;
+  --badge-tech-bg: #ebdbb2;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Gruvbox - Domain tokens (AUQ question-card chips). */
+[data-theme="gruvbox"] {
+  --color-domain-ux: #fe8019; --color-domain-arch: #83a598; --color-domain-sec: #fb4934;
+  --color-domain-data: #b8bb26; --color-domain-tooling: #d3869b;
+  --color-domain-infra: #fabd2f; --color-domain-billing: #8ec07c;
+}
+[data-theme="gruvbox"][data-mode="light"] {
+  --color-domain-ux: #af3a03; --color-domain-arch: #076678; --color-domain-sec: #9d0006;
+  --color-domain-data: #79740e; --color-domain-tooling: #8f3f71;
+  --color-domain-infra: #b57614; --color-domain-billing: #427b58;
+}

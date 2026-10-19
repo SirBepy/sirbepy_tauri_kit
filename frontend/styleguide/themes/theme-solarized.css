@@ -1,0 +1,54 @@
+/* Solarized - Dark */
+[data-theme="solarized"] {
+  --color-primary: #268bd2;
+  --color-primary-rgb: 38, 139, 210;
+  --color-secondary: #2aa198;
+  --color-accent: #268bd2;
+  --color-background: #002b36;
+  --color-surface: #073642;
+  --color-surface-alt: #0b3f4c;
+  --color-text: #eee8d5;
+  --color-text-muted: #a3b0b0;
+  --color-border: #0f4a5a;
+  --color-success: #859900;
+  --color-danger: #ec5a55;
+  --color-info: #2aa198;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #073642;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Solarized - Light */
+[data-theme="solarized"][data-mode="light"] {
+  --color-primary: #1f6fa8;
+  --color-primary-rgb: 31, 111, 168;
+  --color-secondary: #23877f;
+  --color-accent: #1f6fa8;
+  --color-background: #eee8d5;
+  --color-surface: #fdf6e3;
+  --color-surface-alt: #f5efdc;
+  --color-text: #073642;
+  --color-text-muted: #586e75;
+  --color-border: #e0d9c3;
+  --color-success: #738500;
+  --color-danger: #dc322f;
+  --color-info: #23877f;
+  --badge-tech-bg: #eee8d5;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Solarized - Domain tokens (AUQ question-card chips). */
+[data-theme="solarized"] {
+  --color-domain-ux: #268bd2; --color-domain-arch: #8287d6; --color-domain-sec: #ec5a55;
+  --color-domain-data: #859900; --color-domain-tooling: #e0559a;
+  --color-domain-infra: #e0662f; --color-domain-billing: #2aa198;
+}
+[data-theme="solarized"][data-mode="light"] {
+  --color-domain-ux: #1f6fa8; --color-domain-arch: #6c71c4; --color-domain-sec: #dc322f;
+  --color-domain-data: #738500; --color-domain-tooling: #d33682;
+  --color-domain-infra: #cb4b16; --color-domain-billing: #23877f;
+}

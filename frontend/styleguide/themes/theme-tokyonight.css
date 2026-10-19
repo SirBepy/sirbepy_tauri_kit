@@ -1,0 +1,54 @@
+/* Tokyo Night - Dark */
+[data-theme="tokyonight"] {
+  --color-primary: #7aa2f7;
+  --color-primary-rgb: 122, 162, 247;
+  --color-secondary: #bb9af7;
+  --color-accent: #7aa2f7;
+  --color-background: #16161e;
+  --color-surface: #1a1b26;
+  --color-surface-alt: #24283b;
+  --color-text: #c0caf5;
+  --color-text-muted: #9aa5ce;
+  --color-border: #292e42;
+  --color-success: #9ece6a;
+  --color-danger: #f7768e;
+  --color-info: #7dcfff;
+  --font-heading: 'Manrope', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+  --badge-tech-bg: #24283b;
+  --radius-card: 10px;
+  --radius-badge: 6px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* Tokyo Night - Light */
+[data-theme="tokyonight"][data-mode="light"] {
+  --color-primary: #2563c9;
+  --color-primary-rgb: 37, 99, 201;
+  --color-secondary: #9854f1;
+  --color-accent: #2563c9;
+  --color-background: #e1e2e7;
+  --color-surface: #f3f4f8;
+  --color-surface-alt: #d0d5e3;
+  --color-text: #3760bf;
+  --color-text-muted: #45548c;
+  --color-border: #c4c8da;
+  --color-success: #587539;
+  --color-danger: #f52a65;
+  --color-info: #007197;
+  --badge-tech-bg: #d0d5e3;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Tokyo Night - Domain tokens (AUQ question-card chips). */
+[data-theme="tokyonight"] {
+  --color-domain-ux: #7aa2f7; --color-domain-arch: #bb9af7; --color-domain-sec: #f7768e;
+  --color-domain-data: #9ece6a; --color-domain-tooling: #e0af68;
+  --color-domain-infra: #ff9e64; --color-domain-billing: #73daca;
+}
+[data-theme="tokyonight"][data-mode="light"] {
+  --color-domain-ux: #2563c9; --color-domain-arch: #9854f1; --color-domain-sec: #f52a65;
+  --color-domain-data: #587539; --color-domain-tooling: #8c6c3e;
+  --color-domain-infra: #b15c00; --color-domain-billing: #118c74;
+}
